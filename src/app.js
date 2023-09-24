@@ -30,7 +30,8 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
 const MongoStore = require('connect-mongo');
-const User = require('./models/User');
+const { User } = require('./models/User');
+
 const { createHash, isValidatePassword } = require('./utils');
 const passport = require("passport")
 const initializePassport = require("./config/passport.config")
@@ -45,6 +46,8 @@ mongoose.connect('mongodb+srv://leninacosta2107:implementacionlogin@cluster0.3bp
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
     store: MongoStore.create({
@@ -64,29 +67,8 @@ app.engine("handlebars", handlebars.engine())
 app.set("views", __dirname + '/views')
 app.set("view engine", "handlebars")
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-app.post('/register', passport.authenticate("register", { failureRedirect: "/failuregister" }), async (req, res) => {
-    let { first_name, last_name, email, age, password } = req.body;
 
-    if (!first_name || !last_name || !email || !age || !password) {
-        return res.status(400).send('Missing data.');
-    }
-
-    const hashedPassword = createHash(password);
-
-    let user = await User.create({
-        first_name,
-        last_name,
-        email,
-        age,
-        password: hashedPassword
-    });
-
-    res.send({ status: "success", payload: user });
-    console.log('User registered successfully.' + user);
-});
 
 app.get("/failuregister", async (req, res) => {
     console.log("Authentication failure")
