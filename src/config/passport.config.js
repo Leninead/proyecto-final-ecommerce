@@ -1,18 +1,17 @@
 const passport = require('passport');
-const local = require('passport-local');
-const userService = require('../models/User');
+const LocalStrategy = require('passport-local').Strategy;
+const GitHubStrategy = require('passport-github').Strategy;
+const User = require('../models/User');
 const { isValidatePassword } = require('../utils');
-
-const localStrategy = local.Strategy;
 
 const initializePassport = () => {
   passport.use(
     'login',
-    new localStrategy(
+    new LocalStrategy(
       { usernameField: 'email' },
       async (username, password, done) => {
         try {
-          const user = await userService.findOne({ email: username });
+          const user = await User.findOne({ email: username });
 
           if (!user) {
             console.log('User not found');
@@ -34,6 +33,18 @@ const initializePassport = () => {
       }
     )
   );
+
+  // GitHub Strategy
+  passport.use(new GitHubStrategy({
+    clientID: GITHUB_CLIENT_ID,
+    clientSecret: GITHUB_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/github/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    // Use the GitHub profile information to create or authenticate the user
+    return done(null, profile);
+  }
+  ));
 };
 
 module.exports = initializePassport;

@@ -1,25 +1,59 @@
 
 /*
-TASK REQUIREMENT: Implementación de login. Consigna
+TASK REQUIREMENT: Refactor a nuestro login  
+Consigna
 
-Ajustar nuestro servidor principal para trabajar con un sistema de login.
-
+Con base en el login de nuestro entregable anterior, refactorizar para incluir los nuevos conceptos.
 Aspectos a incluir
 
--Deberá contar con todas las vistas realizadas en el hands on lab, así también como las rutas de router para procesar el registro y el login. 
--Una vez completado el login, realizar la redirección directamente a la vista de productos.                  
--Agregar a la vista de productos un mensaje de bienvenida con los datos del usuario
+Se deberá contar con un hasheo de contraseña utilizando bcrypt
+Se deberá contar con una implementación de passport, tanto para register como para login.
+Implementar el método de autenticación de GitHub a la vista de login.
+ormato
 
--Agregar un sistema de roles, de manera que si colocamos en el login como correo adminCoder@coder.com, y la contraseña adminCod3r123, el usuario de la sesión además tenga un campo 
--Todos los usuarios que no sean admin deberán contar con un rol “usuario”.
--Implementar botón de “logout” para destruir la sesión y redirigir a la vista de login                             Formato
-
-Link al repositorio de Github sin node_modules
-
+Link al repositorio de GitHub con el proyecto solicitado.
 Sugerencias
+El testeo se realizará de manera muy similar al anterior, puedes consultar el documento de testing aquí: 
 
-Recuerda que las vistas son importantes, más no el diseño, concéntrate en la funcionalidad de las sesiones antes que en la presentación.
-Cuida las redirecciones a las múltiples vistas.   
+
+
+
+
+
+
+
+Based on the codes you've implemented, here are the next steps to complete the refactoring and incorporate the required aspects:
+
+1)Hashing Passwords using Bcrypt:
+
+Verify that you've integrated bcrypt to hash user passwords during registration. Make sure this is working correctly.
+
+2)Implementing Passport for Register and Login:
+Ensure that Passport.js is fully integrated for both registration and login.
+In the registration route, hash the password using bcrypt before saving it to the database.
+In the login route, use the LocalStrategy to authenticate users.
+
+3)Authentication via GitHub:
+Complete the GitHub authentication integration using the GitHubStrategy from Passport-GitHub.
+Make sure to handle GitHub authentication callbacks and properly associate the GitHub authentication with user accounts.
+
+4)Testing:
+Thoroughly test the registration, login, and GitHub authentication functionalities to ensure they work as expected.
+Use various scenarios for testing, including incorrect inputs, missing data, and successful logins via both the local strategy and GitHub authentication.
+
+5)Clean Code and Structure:
+
+Ensure your code is well-organized, follows a consistent style, and adheres to best practices.
+Consider refactoring and restructuring code if needed to improve readability and maintainability.
+
+6)Documentation:
+
+Update your README file to include information about the new changes, how to register/login using the updated features, and how GitHub authentication is integrated.
+
+7)Submission:
+
+Once you've completed and thoroughly tested the implementation, submit the GitHub repository link as required by the task.
+Go through each aspect carefully, ensure everything is functioning correctly, and organize your code and documentation appropriately. Finally, submit the GitHub repository link for review.
 
 clave:   implementacionlogin
 */
@@ -39,6 +73,7 @@ const usersRouter = require('./routes/users.router');
 const path = require('path');
 
 const app = express();
+
 app.set('views', path.join(__dirname, 'views'));
 mongoose.connect('mongodb+srv://leninacosta2107:implementacionlogin@cluster0.3bpxnoe.mongodb.net/?retryWrites=true&w=majority', {
     useNewUrlParser: true,
@@ -67,6 +102,16 @@ app.engine("handlebars", handlebars.engine())
 app.set("views", __dirname + '/views')
 app.set("view engine", "handlebars")
 
+app.get('/auth/github',
+  passport.authenticate('github'));
+
+app.get('/auth/github/callback',
+  passport.authenticate('github', { failureRedirect: '/' }),
+  function(req, res) {
+    // Successful authentication, redirect to a page.
+    res.redirect('/dashboard');
+  }
+);
 
 
 

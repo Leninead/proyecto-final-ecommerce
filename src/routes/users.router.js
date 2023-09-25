@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { User } = require('../models/User');
 const { createHash, isValidatePassword } = require('../utils');
-
+const bcrypt = require('bcrypt');
 // Login Page
 router.get('/login', async (req, res) => {
     res.render('login');
@@ -43,14 +43,15 @@ router.get('/products', async (req, res) => {
 router.post('/register', async (req, res) => {
     try {
         const { firstName, lastName, email, age, password } = req.body;
-        console.log('Received data:', req.body); 
+        console.log('Received data:', req.body);
 
         if (!firstName || !lastName || !email || !age || !password) {
-            console.log('Missing data:', req.body); 
+            console.log('Missing data:', req.body);
             return res.status(400).send('Missing data.');
         }
 
-        const hashedPassword = createHash(password);
+        // Hash the password using bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
             firstName,
@@ -60,15 +61,16 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
         });
 
-        console.log('User registered successfully: ' + user);
+        console.log('User registered successfully:', user);
 
         // Redirect to login page after registration
-        res.redirect('/users/login');
+        res.redirect('/login');
     } catch (error) {
         console.error('Error during registration: ', error);
         return res.status(500).send('Internal server error');
     }
 });
+
 
 // User Login
 router.post('/login', async (req, res) => {
