@@ -1,23 +1,35 @@
-# Login System Implementation
+# Refactor to our login
 
-This project implements a login system for a web application.
+## Overview
 
-## Introduction
+This project focuses on providing secure and user-friendly authentication features for users. It includes hashing passwords using Bcrypt, integrating Passport for smooth registration and login, and allowing GitHub authentication for enhanced user convenience.
 
-The aim of this project is to implement a login system into our main server. The project includes necessary views and routes for registration and login. After successful login, users are redirected to the products view.
+## Hashing Passwords using Bcrypt
 
-## Features
+To enhance security, we use Bcrypt to hash passwords before storing them in the database. This process transforms plain-text passwords into a secure hashed representation. Here's how Bcrypt helps:
 
-- User registration and login:
-`The application allows users to register and log in using their email and password. When users register, their data is securely stored in the database, and during login, the system authenticates their credentials. Passwords are hashed for security using bcrypt.`
-- Redirect to products view after successful login:
-`Upon successfully logging in, users are automatically redirected to the products view, providing a seamless transition into the main functionality of the application..`
-- Display welcome message with user details on the products view:
-`For a personalized experience, the products view displays a welcome message that includes the user's details. This message provides a friendly greeting to the user, enhancing the user experience.`
-- Role-based system: 'admin' and 'usuario':
-`The application implements a role-based system to distinguish between regular users ('usuario') and administrators ('admin'). Based on their role, users are granted different levels of access and privileges within the application. For example, an admin might have access to additional administrative functionalities.`
-- Logout functionality
-`The application offers a logout functionality, allowing users to securely end their session. Upon logout, the user's session data is destroyed, ensuring their information remains private and inaccessible.`
+- **Hashing**: Bcrypt converts passwords into a hash string, making it computationally intensive for attackers to reverse-engineer the original password.
+  
+- **Salting**: Bcrypt automatically generates and appends a random "salt" to each password before hashing. This further strengthens the security of the hashed password.
+
+## Implementation of Passport for Register and Login
+
+Passport.js, a widely-used authentication middleware, is implemented for user registration and login processes. Passport provides several strategies for authentication, including local authentication and OAuth. Here's how we use it:
+
+- **Local Authentication**: Passport's local strategy is used for registering and logging in users with their email and password.
+
+- **Middleware Integration**: Passport middleware is integrated into the authentication flow, allowing for efficient and secure user authentication.
+
+- **Customization**: Passport is customized to suit our application's specific authentication needs and provide a seamless experience to users.
+
+## GitHub Authentication Method on the Login View
+
+In addition to traditional login methods, our application offers GitHub authentication. This allows users to log in using their GitHub credentials. The benefits of GitHub authentication include:
+
+- **Convenience**: Users can log in using their existing GitHub accounts, eliminating the need to remember additional login credentials.
+
+- **Security**: GitHub authentication leverages GitHub's secure authentication system, enhancing the overall security of our application.
+
 
 ## Setup
 
@@ -38,48 +50,42 @@ This will initiate the server, and it will start listening on the specified port
 
 4. Open your web browser and enter http://localhost:8080 to access the application. From there, you can register as a new user or log in if you already have an account.
 
+# Endpoints
 
-## Endpoints
+## Login Page
+- **Endpoint:** `/login`
+- **HTTP Method:** GET
+- **Description:** Renders the login page for users to enter their credentials and authenticate.
 
-### User Registration and Login
+## Registration Page
+- **Endpoint:** `/register`
+- **HTTP Method:** POST
+- **Description:** Handles the registration of a new user based on the provided data.
 
-- **GET `/users/register`**: Display the registration page where users can sign up with their details.
+## User Login
+- **Endpoint:** `/login`
+- **HTTP Method:** POST
+- **Description:** Handles user login based on the provided email and password.
 
-- **POST `/users/register`**: Handle user registration. Requires a JSON object with user registration data (firstName, lastName, email, age, password).
+## User Logout
+- **Endpoint:** `/logout`
+- **HTTP Method:** GET
+- **Description:** Initiates the user logout process, destroying the session and redirecting to the login page.
 
-- **GET `/users/login`**: Display the login page where users can enter their credentials.
-
-- **POST `/users/login`**: Handle user login. Requires a JSON object with user login data (email, password).
-
-### Redirect to Products View after Successful Login
-
-- Upon successful login, users are redirected to the products view (`/products`) where they can view available products.
-
-### Display Welcome Message with User Details on the Products View
-
-- **GET `/products`**: Display the products view with a welcome message containing user details.
-
-### Role-Based System: 'admin' and 'usuario'
-
-- Implement a role-based system differentiating between 'admin' and 'usuario' (user). This may affect application behavior based on the user's role.
-
-### Logout Functionality
-
-- **GET `/users/logout`**: Handle user logout, destroying the session and redirecting to the login view.
 
 
 ## Endpoints Overview
 
 ### GET: users/login
-![GET: users/login](./public/img/users-login-get.jpg)
+![GET: users/login](./public/img/get-login.jpg)
+### GET: users/products
+![GET: users/products](./public/img/get-products.jpg)
 ### GET: users/logout
-![GET: users/logout](./public/img/USERS-LOGOUT-GET.jpg)
-### GET: users/register
-![GET: users/register](./public/img/users-register-get.jpg)
+![GET: users/logout](./public/img/users-logout.jpg)
 ### POST: users/register
-![POST: users/register](./public/img/users-register-post.jpg)
+![POST: users/register](./public/img/users-register.jpg)
 ## MongoDB Atlas Collections
-![MongoDB Atlas Collections](./public/gif/monDbatlas-collections.gif)
+![MongoDB Atlas Collections](./public/gif/mongodb-atlas-collections.gif)
 
 ## Contact
 

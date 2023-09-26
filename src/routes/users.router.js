@@ -9,45 +9,18 @@ router.get('/login', async (req, res) => {
 });
 
 // Registration Page
-router.get('/register', async (req, res) => {
-    res.render('register');
-});
-
-
-// User Profile Page
-router.get('/profile', async (req, res) => {
-    if (!req.session.user) {
-        return res.redirect('/login');
-    }
-
-    const { firstName, lastName, email, age } = req.session.user;
-
-    res.render('profile', { firstName, lastName, age, email });
-});
-
-// Handle GET request for /products
-router.get('/products', async (req, res) => {
-    // Sample product data
-    const products = [
-        { id: 1, name: 'Product 1', price: 100 },
-        { id: 2, name: 'Product 2', price: 200 },
-        // Add more products as needed
-    ];
-    
-    // Render the Handlebars template with the product data
-    res.render('products', { products });
-});
-
-
-// User Registration
 router.post('/register', async (req, res) => {
     try {
         const { firstName, lastName, email, age, password } = req.body;
-        console.log('Received data:', req.body);
 
         if (!firstName || !lastName || !email || !age || !password) {
-            console.log('Missing data:', req.body);
             return res.status(400).send('Missing data.');
+        }
+
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return res.status(400).send('User with this email already exists.');
         }
 
         // Hash the password using bcrypt
@@ -61,9 +34,6 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
         });
 
-        console.log('User registered successfully:', user);
-
-        // Redirect to login page after registration
         res.redirect('/login');
     } catch (error) {
         console.error('Error during registration: ', error);
@@ -72,6 +42,9 @@ router.post('/register', async (req, res) => {
 });
 
 
+
+
+// User Login
 // User Login
 router.post('/login', async (req, res) => {
     console.log('Login request received.');
@@ -90,7 +63,10 @@ router.post('/login', async (req, res) => {
             return res.status(400).render('login', { error: 'User not found' });
         }
 
-        const isPasswordValid = isValidatePassword(user, password);
+        console.log('Hashed Password from DB:', user.password);
+        console.log('Provided Password:', password);
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
             console.log('Incorrect password.');
@@ -107,6 +83,7 @@ router.post('/login', async (req, res) => {
         return res.status(500).render('login', { error: 'Internal server error' });
     }
 });
+
 
 // User Logout
 router.get('/logout', async (req, res) => {

@@ -15,46 +15,6 @@ Link al repositorio de GitHub con el proyecto solicitado.
 Sugerencias
 El testeo se realizará de manera muy similar al anterior, puedes consultar el documento de testing aquí: 
 
-
-
-
-
-
-
-
-Based on the codes you've implemented, here are the next steps to complete the refactoring and incorporate the required aspects:
-
-1)Hashing Passwords using Bcrypt:
-
-Verify that you've integrated bcrypt to hash user passwords during registration. Make sure this is working correctly.
-
-2)Implementing Passport for Register and Login:
-Ensure that Passport.js is fully integrated for both registration and login.
-In the registration route, hash the password using bcrypt before saving it to the database.
-In the login route, use the LocalStrategy to authenticate users.
-
-3)Authentication via GitHub:
-Complete the GitHub authentication integration using the GitHubStrategy from Passport-GitHub.
-Make sure to handle GitHub authentication callbacks and properly associate the GitHub authentication with user accounts.
-
-4)Testing:
-Thoroughly test the registration, login, and GitHub authentication functionalities to ensure they work as expected.
-Use various scenarios for testing, including incorrect inputs, missing data, and successful logins via both the local strategy and GitHub authentication.
-
-5)Clean Code and Structure:
-
-Ensure your code is well-organized, follows a consistent style, and adheres to best practices.
-Consider refactoring and restructuring code if needed to improve readability and maintainability.
-
-6)Documentation:
-
-Update your README file to include information about the new changes, how to register/login using the updated features, and how GitHub authentication is integrated.
-
-7)Submission:
-
-Once you've completed and thoroughly tested the implementation, submit the GitHub repository link as required by the task.
-Go through each aspect carefully, ensure everything is functioning correctly, and organize your code and documentation appropriately. Finally, submit the GitHub repository link for review.
-
 clave:   implementacionlogin
 */
 
@@ -65,6 +25,7 @@ const bodyParser = require('body-parser');
 const handlebars = require('express-handlebars');
 const MongoStore = require('connect-mongo');
 const { User } = require('./models/User');
+const productsRouter = require('./routes/products.router'); // New router for products
 
 const { createHash, isValidatePassword } = require('./utils');
 const passport = require("passport")
@@ -75,7 +36,7 @@ const path = require('path');
 const app = express();
 
 app.set('views', path.join(__dirname, 'views'));
-mongoose.connect('mongodb+srv://leninacosta2107:implementacionlogin@cluster0.3bpxnoe.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://leninacosta2107:refactornuestrologin@cluster0.uwfktuc.mongodb.net/?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
@@ -86,7 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
     store: MongoStore.create({
-        mongoUrl: 'mongodb+srv://leninacosta2107:implementacionlogin@cluster0.3bpxnoe.mongodb.net/?retryWrites=true&w=majority',
+        mongoUrl: 'mongodb+srv://leninacosta2107:refactornuestrologin@cluster0.uwfktuc.mongodb.net/?retryWrites=true&w=majority',
         mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
         ttl: 600,
     }),
@@ -95,6 +56,8 @@ app.use(session({
     saveUninitialized: true,
 }));
 app.use('/users', usersRouter);
+// Use the products router for product-related routes
+app.use('/products', productsRouter);
 app.use(passport.initialize())
 app.use(passport.session())
 
