@@ -9,26 +9,28 @@ const initializePassport = () => {
     'login',
     new LocalStrategy(
       { usernameField: 'email' },
-      async (username, password, done) => {
+      async function(accessToken, refreshToken, profile, done) {
         try {
-          const user = await User.findOne({ email: username });
-
-          if (!user) {
-            console.log('User not found');
-            return done(null, false);
-          }
-
-          const isPasswordValid = isValidatePassword(password, user.password);
-
-          if (!isPasswordValid) {
-            console.log('Invalid password');
-            return done(null, false);
-          }
-
-          return done(null, user);
+            console.log('Profile:', profile);
+    
+            let userEmail = null;
+    
+            if (profile.emails && profile.emails.length > 0) {
+                userEmail = profile.emails[0].value;
+            }
+    
+            if (!userEmail) {
+                console.error('User email not provided by GitHub.');
+                // Redirect or render a page for the user to provide their email
+                return done(null, false, { message: 'User email not provided by GitHub.' });
+            }
+    
+            // Check if the user is already registered
+            let user = await User.findOne({ email: userEmail });
+    
+            // ... rest of your code
         } catch (error) {
-          console.error('Error during login: ', error);
-          return done('Error during login');
+            return done(error);
         }
       }
     )
@@ -36,15 +38,31 @@ const initializePassport = () => {
 
   // GitHub Strategy
   passport.use(new GitHubStrategy({
-    clientID: GITHUB_CLIENT_ID,
-    clientSecret: GITHUB_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/github/callback"
+    clientID: 'cf5ce53a267057e74936', // Replace with your GitHub client ID
+    clientSecret: '9dd5894e8b2f887c3fccef5e458765d2424d6120', // Replace with your GitHub client secret
+    callbackURL: "http://localhost:8080/auth/github/callback"
   },
-  function(accessToken, refreshToken, profile, done) {
-    // Use the GitHub profile information to create or authenticate the user
-    return done(null, profile);
+  async function(accessToken, refreshToken, profile, done) {
+    try {
+      console.log('Profile:', profile);  // Add this line for debugging
+  
+      let userEmail = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
+  
+      if (!userEmail) {
+        console.error('User email not provided by GitHub.');
+        return done(null, false);
+      }
+  
+      // Check if the user is already registered
+      let user = await User.findOne({ email: userEmail });
+      // ... rest of your code
+    } catch (error) {
+      return done(error);
+    }
   }
-  ));
+));
+
 };
 
 module.exports = initializePassport;
+

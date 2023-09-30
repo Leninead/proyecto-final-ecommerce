@@ -17,7 +17,6 @@ El testeo se realizará de manera muy similar al anterior, puedes consultar el d
 
 clave:   implementacionlogin
 */
-
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -26,24 +25,33 @@ const handlebars = require('express-handlebars');
 const MongoStore = require('connect-mongo');
 const { User } = require('./models/User');
 const productsRouter = require('./routes/products.router'); // New router for products
-
-const { createHash, isValidatePassword } = require('./utils');
+const homeRouter = require('./routes/users.router'); 
 const passport = require("passport")
-const initializePassport = require("./config/passport.config")
+const initializePassport = require('./config/passport.config')
 const usersRouter = require('./routes/users.router');
 const path = require('path');
+const { isValidatePassword } = require('./utils');
 
 const app = express();
 
+// Body parsing middlewares
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+
+
+// Initialize Passport
+initializePassport();
+
 app.set('views', path.join(__dirname, 'views'));
+
 mongoose.connect('mongodb+srv://leninacosta2107:refactornuestrologin@cluster0.uwfktuc.mongodb.net/?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+
 
 app.use(session({
     store: MongoStore.create({
@@ -55,18 +63,21 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
+
+
+app.use('/', homeRouter); 
 app.use('/users', usersRouter);
-// Use the products router for product-related routes
 app.use('/products', productsRouter);
 app.use(passport.initialize())
 app.use(passport.session())
 
 app.engine("handlebars", handlebars.engine())
-app.set("views", __dirname + '/views')
 app.set("view engine", "handlebars")
 
-app.get('/auth/github',
-  passport.authenticate('github'));
+
+app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+
 
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/' }),

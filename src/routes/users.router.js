@@ -3,11 +3,18 @@ const router = express.Router();
 const { User } = require('../models/User');
 const { createHash, isValidatePassword } = require('../utils');
 const bcrypt = require('bcrypt');
+
+
+
+router.get('/', (req, res) => {
+    res.render('home'); // Render the home.handlebars view
+});
 // Login Page
 router.get('/login', async (req, res) => {
     res.render('login');
 });
 
+// Registration Page
 // Registration Page
 router.post('/register', async (req, res) => {
     try {
@@ -22,10 +29,11 @@ router.post('/register', async (req, res) => {
         if (existingUser) {
             return res.status(400).send('User with this email already exists.');
         }
+        const saltRounds = 10;
+        // Hash the password using createHash from utils
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Hash the password using bcrypt
-        const hashedPassword = await bcrypt.hash(password, 10);
-
+        // Create a new user with the hashed password
         const user = await User.create({
             firstName,
             lastName,
@@ -33,6 +41,9 @@ router.post('/register', async (req, res) => {
             age,
             password: hashedPassword,
         });
+
+        // Do something with the user if needed
+        console.log('New user created:', user);
 
         res.redirect('/login');
     } catch (error) {
@@ -83,6 +94,7 @@ router.post('/login', async (req, res) => {
         return res.status(500).render('login', { error: 'Internal server error' });
     }
 });
+
 
 
 // User Logout

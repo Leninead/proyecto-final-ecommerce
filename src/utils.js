@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
 
 const createHash = (password) => {
   try {
@@ -10,9 +10,9 @@ const createHash = (password) => {
   }
 };
 
-const isValidatePassword = (user, password) => {
+const isValidatePassword = (password, hashedPassword) => {
   try {
-    return bcrypt.compareSync(password, user.password);
+    return bcrypt.compareSync(password, hashedPassword);
   } catch (error) {
     throw new Error("Error validating password: " + error.message);
   }

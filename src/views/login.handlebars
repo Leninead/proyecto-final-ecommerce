@@ -1,5 +1,5 @@
 <!-- views/login.handlebars -->
-<form method="POST" action="/users/login">
+<form id="loginForm" method="POST" action="/users/login">
     <label for="email">Email</label>
     <input type="email" name="email" required>
 
@@ -8,6 +8,8 @@
 
     <button type="submit">Login</button>
     <a href="/restore">Restaurar la contraseña</a>
-
-
 </form>
+
+<!-- Link to the external JavaScript file -->
+<script src="../scripts.js"></script>
+
