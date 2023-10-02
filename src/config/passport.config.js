@@ -1,68 +1,88 @@
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const GitHubStrategy = require('passport-github').Strategy;
-const User = require('../models/User');
+const { Strategy: LocalStrategy } = require('passport-local');
+const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
+const { User } = require('../models/User');
+const { JWT_SECRET } = require('../config/config');
 const { isValidatePassword } = require('../utils');
 
-const initializePassport = () => {
-  passport.use(
-    'login',
-    new LocalStrategy(
-      { usernameField: 'email' },
-      async function(accessToken, refreshToken, profile, done) {
-        try {
-            console.log('Profile:', profile);
-    
-            let userEmail = null;
-    
-            if (profile.emails && profile.emails.length > 0) {
-                userEmail = profile.emails[0].value;
-            }
-    
-            if (!userEmail) {
-                console.error('User email not provided by GitHub.');
-                // Redirect or render a page for the user to provide their email
-                return done(null, false, { message: 'User email not provided by GitHub.' });
-            }
-    
-            // Check if the user is already registered
-            let user = await User.findOne({ email: userEmail });
-    
-            // ... rest of your code
-        } catch (error) {
-            return done(error);
-        }
-      }
-    )
-  );
-
-  // GitHub Strategy
-  passport.use(new GitHubStrategy({
-    clientID: 'cf5ce53a267057e74936', // Replace with your GitHub client ID
-    clientSecret: '9dd5894e8b2f887c3fccef5e458765d2424d6120', // Replace with your GitHub client secret
-    callbackURL: "http://localhost:8080/auth/github/callback"
-  },
-  async function(accessToken, refreshToken, profile, done) {
-    try {
-      console.log('Profile:', profile);  // Add this line for debugging
-  
-      let userEmail = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
-  
-      if (!userEmail) {
-        console.error('User email not provided by GitHub.');
-        return done(null, false);
-      }
-  
-      // Check if the user is already registered
-      let user = await User.findOne({ email: userEmail });
-      // ... rest of your code
-    } catch (error) {
-      return done(error);
-    }
+const cookieExtractor = (req) => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies['jwt']; // assuming your cookie is named 'jwt'
   }
-));
-
+  return token;
 };
 
-module.exports = initializePassport;
+const configurePassport = () => {
+  // Local Strategy
+  passport.use('login', new LocalStrategy(
+    { usernameField: 'email' },
+    async function(email, password, done) {
+      try {
+        const user = await User.findOne({ email: email });
+  
+        if (!user) {
+          return done(null, false, { message: 'User not found.' });
+        }
+  
+        const isValidPassword = isValidatePassword(password, user.password);
+  
+        if (!isValidPassword) {
+          return done(null, false, { message: 'Incorrect password.' });
+        }
+  
+        return done(null, user);
+      } catch (error) {
+        return done(error);
+      }
+    }
+  ));
+
+  // JWT Strategy
+  const jwtOptions = {
+    jwtFromRequest: cookieExtractor, // Use the cookie extractor here
+    secretOrKey: JWT_SECRET
+  };
+
+  passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
+    try {
+      const user = await User.findById(jwtPayload.id);
+      if (user) {
+        return done(null, user);
+      } else {
+        return done(null, false);
+      }
+    } catch (error) {
+      return done(error, false);
+    }
+  }));
+
+  // Serialize and deserialize user for session management
+  passport.serializeUser(function(user, done) {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async function(id, done) {
+    try {
+      let user = await User.findById(id);
+      done(null, user);
+    } catch (error) {
+      done(error);
+    }
+  });
+};
+
+module.exports = configurePassport;
+
+
+
+
+
+
+
+
+
+
+
+
 

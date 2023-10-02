@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models/User');
-const { createHash, isValidatePassword } = require('../utils');
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const { JWT_SECRET } = require('../config/config'); // Adjust this according to your structure
+const User = require('../models/User');
+
+
 const bcrypt = require('bcrypt');
 
 
 
 router.get('/', (req, res) => {
-    res.render('home'); // Render the home.handlebars view
-});
-// Login Page
-router.get('/login', async (req, res) => {
-    res.render('login');
+  res.render('home'); // Renders views/home.ejs
 });
 
-// Registration Page
+
 // Registration Page
 router.post('/register', async (req, res) => {
     try {
@@ -29,11 +29,10 @@ router.post('/register', async (req, res) => {
         if (existingUser) {
             return res.status(400).send('User with this email already exists.');
         }
+        
         const saltRounds = 10;
-        // Hash the password using createHash from utils
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Create a new user with the hashed password
         const user = await User.create({
             firstName,
             lastName,
@@ -42,10 +41,14 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
         });
 
-        // Do something with the user if needed
-        console.log('New user created:', user);
+        // Generate JWT token after successfully creating the user
+        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
 
-        res.redirect('/login');
+        // Send the token as a response
+        return res.status(200).json({ token });
+
+        // Or if you want to redirect to login
+        // res.redirect('/login');
     } catch (error) {
         console.error('Error during registration: ', error);
         return res.status(500).send('Internal server error');
@@ -54,49 +57,37 @@ router.post('/register', async (req, res) => {
 
 
 
-
-// User Login
-// User Login
 router.post('/login', async (req, res) => {
-    console.log('Login request received.');
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    if (!email || !password) {
-        console.log('Invalid login request. Email or password missing.');
-        return res.status(400).render('login', { error: 'Invalid values' });
-    }
+  console.log('Received login request for email:', email);
+  
+  try {
+      const user = await User.findOne({ email });
 
-    try {
-        const user = await User.findOne({ email });
+      if (!user) {
+          console.log('User not found for email:', email);
+          return res.status(401).json({ message: 'User not found.' });
+      }
 
-        if (!user) {
-            console.log('User not found.');
-            return res.status(400).render('login', { error: 'User not found' });
-        }
+      // Compare the provided password with the hashed password
+      const isValidPassword = await bcrypt.compare(password, user.password);
 
-        console.log('Hashed Password from DB:', user.password);
-        console.log('Provided Password:', password);
+      if (!isValidPassword) {
+          console.log('Incorrect password for email:', email);
+          return res.status(401).json({ message: 'Incorrect password.' });
+      }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            console.log('Incorrect password.');
-            return res.status(401).render('login', { error: 'Incorrect password' });
-        }
-
-        // Set the user in the session
-        req.session.user = user;
-        console.log('User logged in successfully:', user);
-        // Redirect to the product view upon successful login
-        return res.redirect('/products');
-    } catch (error) {
-        console.error('Error during login: ', error);
-        return res.status(500).render('login', { error: 'Internal server error' });
-    }
+      console.log('Login successful for email:', email);
+      return res.status(200).json({ message: 'Login successful!' });
+  } catch (error) {
+      console.error('Error during login:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+  }
 });
 
-
-
+  
+  
 // User Logout
 router.get('/logout', async (req, res) => {
     console.log('Logout initiated.');
@@ -106,8 +97,39 @@ router.get('/logout', async (req, res) => {
             return res.status(500).send('Internal server error');
         }
         console.log('Session destroyed.');
-        res.redirect('/login');
+        res.redirect('/');
     });
+});
+
+// API endpoint to get the current user based on JWT token
+
+router.get('/api/sessions/current', (req, res) => {
+  // Extract the JWT token from the Authorization header
+  const token = req.header('Authorization');
+
+  // Check if the token exists
+  if (!token) {
+    return res.status(401).json({ message: 'No JWT token found' });
+  }
+
+  // Verify the JWT token and fetch the user based on the decoded token
+  jwt.verify(token.split(' ')[1], JWT_SECRET, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid JWT token' });
+    }
+
+    // Fetch the user based on the decoded token
+    try {
+      const user = await User.findById(decoded.id);
+      if (user) {
+        return res.status(200).json({ user });
+      } else {
+        return res.status(401).json({ message: 'User not found' });
+      }
+    } catch (error) {
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  });
 });
 
 module.exports = router;

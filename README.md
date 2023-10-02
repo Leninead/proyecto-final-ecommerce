@@ -1,8 +1,8 @@
-# Refactor to our login
+# E-commerce integration practice.
 
 ## Overview
 
-This project focuses on providing secure and user-friendly authentication features for users. It includes hashing passwords using Bcrypt, integrating Passport for smooth registration and login, and allowing GitHub authentication for enhanced user convenience.
+This project is dedicated to enhancing the security and user experience of our ecommerce platform by implementing robust authentication mechanisms. We have implemented password hashing using Bcrypt, integrated Passport for seamless registration and login, and facilitated GitHub authentication for user convenience. In addition, we've bolstered security and efficiency through the integration of JSON Web Tokens (JWT), allowing for stateless and secure authentication across the platform. This comprehensive approach ensures a safe, efficient, and user-friendly environment for our users during their ecommerce journey.
 
 ## Hashing Passwords using Bcrypt
 
@@ -22,13 +22,6 @@ Passport.js, a widely-used authentication middleware, is implemented for user re
 
 - **Customization**: Passport is customized to suit our application's specific authentication needs and provide a seamless experience to users.
 
-## GitHub Authentication Method on the Login View
-
-In addition to traditional login methods, our application offers GitHub authentication. This allows users to log in using their GitHub credentials. The benefits of GitHub authentication include:
-
-- **Convenience**: Users can log in using their existing GitHub accounts, eliminating the need to remember additional login credentials.
-
-- **Security**: GitHub authentication leverages GitHub's secure authentication system, enhancing the overall security of our application.
 
 
 ## Setup
@@ -50,43 +43,48 @@ This will initiate the server, and it will start listening on the specified port
 
 4. Open your web browser and enter http://localhost:8080 to access the application. From there, you can register as a new user or log in if you already have an account.
 
-# Endpoints
+## Endpoints Overview
 
-## Login Page
-- **Endpoint:** `/login`
-- **HTTP Method:** GET
-- **Description:** Renders the login page for users to enter their credentials and authenticate.
+### 1. Home Page
+- **Endpoint:** `/`
+- **Method:** GET
+- **Description:** Renders the home page view (`views/home.ejs`).
 
-## Registration Page
+### 2. User Registration
 - **Endpoint:** `/register`
-- **HTTP Method:** POST
-- **Description:** Handles the registration of a new user based on the provided data.
+- **Method:** POST
+- **Description:** Registers a new user by accepting first name, last name, email, age, and password in the request body. It hashes the password and creates a user entry. Generates a JWT token upon successful registration.
 
-## User Login
+### 3. User Login
 - **Endpoint:** `/login`
-- **HTTP Method:** POST
-- **Description:** Handles user login based on the provided email and password.
+- **Method:** POST
+- **Description:** Allows a user to log in by providing their email and password. Compares the provided password with the hashed password stored in the database. If successful, responds with a success message and a JWT token.
 
-## User Logout
+### 4. User Logout
 - **Endpoint:** `/logout`
-- **HTTP Method:** GET
-- **Description:** Initiates the user logout process, destroying the session and redirecting to the login page.
+- **Method:** GET
+- **Description:** Initiates the user logout process by destroying the session. Redirects to the home page upon successful logout.
+
+### 5. Get Current User using JWT
+- **Endpoint:** `/api/sessions/current`
+- **Method:** GET
+- **Description:** Extracts the JWT token from the Authorization header. Verifies the token and fetches the user associated with the token. Responds with the user information or an error message if the token is invalid or no token is found.
+
 
 
 
 ## Endpoints Overview
 
-### GET: users/login
-![GET: users/login](./public/img/get-login.jpg)
-### GET: users/products
-![GET: users/products](./public/img/get-products.jpg)
-### GET: users/logout
-![GET: users/logout](./public/img/users-logout.jpg)
+### POST: users/login
+![POST: users/login](./public/img/post-users-login.jpg)
 ### POST: users/register
-![POST: users/register](./public/img/users-register.jpg)
+![POST: users/register](./public/img/post-users-register.jpg)
+### GET: users/api/sessions/register
+![GET: users/api/sessions/register](./public/img/get-users-api-sessions-current.jpg)
+### GET: uusers/logout
+![GET: users/logout](./public/img/get-users-logout.jpg)
 ## MongoDB Atlas Collections
-![MongoDB Atlas Collections](./public/gif/mongodb-atlas-collections.gif)
-
+![MongoDB Atlas Collections](./public/img/MOGODB-ATLAS.jpg)
 ## Contact
 
 For further inquiries or assistance, please reach out to:
