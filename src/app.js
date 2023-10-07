@@ -20,59 +20,6 @@ Aspectos a incluir
 *Agregar al router /api/sessions/ la ruta /current, la cual utilizará el modelo de sesión que estés utilizando, para poder devolver en una respuesta el usuario actual.
 
 
-
-
-
-
-
-Here are the steps you can follow:
-
-Back-End Development:
-a. Create the necessary models (e.g., User) and set up the MongoDB database accordingly.
-b. Implement Passport strategies to handle authentication.
-c. Set up API endpoints for user authentication, sessions, and current user.
-
-Front-End Development:
-a. Once the back end is functional, start a new React project or use an existing one.
-b. Set up routes in your React application to correspond with the API endpoints you've defined in the back end.
-c. Use AJAX requests or a library like Axios to communicate with your back end from the React application.
-d. Create React components to handle different views and interactions for login, registration, profile, etc.
-
-Integration:
-a. Integrate the front end and back end by connecting the API requests from your React application to the back-end API endpoints.
-
-By following this approach, you'll have a well-structured back end ready to serve data and authentication services. You can then focus on creating a dynamic and interactive front end using React or any other technology you prefer.
-
-Feel free to ask if you have any specific questions or need guidance during any stage of this process!
-
-
-
-1)User Model:
-
-Your User model seems to have the required fields: first_name, last_name, email, age, password, cart, and role. Good job!
-
-2)Passport Strategies:
-
-You have implemented the Local and JWT strategies in passport.config.js, which is great. You have also associated these strategies with the User model.
-
-3)Login System:
-
-You have modified the login system to support both session-based and JWT-based authentication. Users can log in using either method.
-
-
-4)JWT Strategy:
-
-You have implemented a JWT strategy and verified the JWT token. You're extracting user information from it and handling cases where the token is valid or invalid.
-
-5)'/api/sessions/' Router:
-
-We have not reviewed the implementation of this route yet.
-
-6)Cookie Extraction for JWT:
-
-You haven't included a cookie extractor specifically for JWT. This can be added to your JWT strategy configuration.
-Shall we proceed with reviewing the /api/sessions/current route and implementing the cookie extraction for JWT?
-
 practicaintegracionecommerce
 {
   "firstName": "lenin",
@@ -86,6 +33,53 @@ practicaintegracionecommerce
 }
 
 mongodb+srv://leninacosta2107:practicaintegracionecommerce@cluster0.vxjntdf.mongodb.net/?retryWrites=true&w=majority
+
+
+
+
+1)User Model and Authentication:
+
+Create a User model and ensure it has the required fields: first_name, last_name, email, age, password, cart (reference to Carts), role.
+
+2)Passport Strategies and Authentication:
+
+Implement Passport strategies for user authentication.
+Ensure that you have strategies for local login (username and password) and JWT authentication.
+Implement a "current" strategy for JWT to extract the user from the token.
+
+3)Login System:
+
+Modify the login system to handle both session-based and JWT-based authentication.
+Update the login endpoint to issue a JWT token upon successful authentication.
+
+4)Cart Model and Endpoints:
+
+You've created the cart.model.js, but ensure that the Cart model has the necessary fields and associations as per the requirements (userId, products, etc.).
+Implement endpoints to handle cart management: adding, updating, deleting products from the cart.
+
+5)Database Integration:
+
+Integrate MongoDB as the primary persistence system for your application.
+Create the necessary MongoDB collections (Users, Products, Carts) to store data as per the requirements.
+
+6)Products Endpoints:
+
+Update the products router (products.router.js) to include endpoints for:
+Handling product listing with pagination, filtering, and sorting.
+Viewing individual product details.
+
+7)Views:
+
+Create views to display products and allow users to interact with the application (e.g., view product details, add to cart).
+
+8)Role Implementation:
+
+Implement a system of roles, where certain users have admin privileges.
+
+Logout Functionality:
+
+Implement a "logout" mechanism to destroy the session and redirect to the login view.
+To summarize, ensure you have implemented the user model, authentication strategies, endpoints for cart management, integrated MongoDB with the necessary collections, and updated the products router with the required endpoints. Additionally, implement views to interact with the application and consider role-based access as needed.
 */
 const express = require('express');
 const mongoose = require('mongoose');
