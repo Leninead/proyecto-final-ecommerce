@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   age: Number,
   password: String,
   cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
-  role: { type: String, default: 'user' }
+  role: { type: String, enum: ['user', 'admin'], default: 'user' }
 });
 
 userSchema.methods.generateJWT = function () {

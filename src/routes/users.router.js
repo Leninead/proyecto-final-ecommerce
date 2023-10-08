@@ -39,6 +39,7 @@ router.post('/register', async (req, res) => {
             email,
             age,
             password: hashedPassword,
+            role: 'user' 
         });
 
         // Generate JWT token after successfully creating the user
@@ -83,6 +84,17 @@ router.post('/login', async (req, res) => {
   } catch (error) {
       console.error('Error during login:', error);
       return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Example route where only admins can access
+router.get('/admin-dashboard', (req, res) => {
+  if (req.user.role === 'admin') {
+    // Allow access to admin dashboard
+    res.status(200).send('Welcome to the admin dashboard.');
+  } else {
+    // Restrict access for non-admin users
+    res.status(403).send('Access denied. Only admins allowed.');
   }
 });
 
