@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const Cart = require('../models/cart.model');
 const Product = require('../models/product.model');
+const Cart = require('../models/cart.model'); // Adjust the path as needed
+
+
 
 // Sample product data
 const products = [
@@ -12,25 +14,22 @@ const products = [
 
 // Route to handle product listing with pagination, filtering, and sorting
 router.get('/', async (req, res) => {
-    // Parse query parameters for pagination, filtering, and sorting
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    // ... Parse other query parameters for filtering and sorting  
-  
     try {
-      // Fetch products based on pagination, filtering, and sorting
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+  
       const products = await Product.find()
         .skip((page - 1) * limit)
-        .limit(limit)
-        // ... Add other query conditions for filtering and sorting
+        .limit(limit);
   
-      res.render('product-list', { products });
+      res.json(products);
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ error: 'Internal server error' });
     }
   });
   // Route to view individual product details
 router.get('/:productId', async (req, res) => {
+    console.log('Received request to add a product:', req.body);
     const productId = req.params.productId;
   
     try {
@@ -45,17 +44,48 @@ router.get('/:productId', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   });
-  
+  router.post('/add-product', async (req, res) => {
+    console.log('Received request to add a product:', req.body);
 
-// POST endpoint to add a product to the cart
-const Product = require('../path/to/product.model'); // Import the Product model
+    const { name, price, description, stock, quantity } = req.body;
+
+    try {
+        console.log('Creating a new product:', { name, price, description, stock, quantity });
+
+        const newProduct = new Product({
+            name,
+            price,
+            description,
+            stock,
+            quantity
+        });
+
+        await newProduct.save();
+
+        res.status(201).json({ message: 'Product added successfully', product: newProduct });
+    } catch (error) {
+        console.error('Error while adding a product:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
 
 router.post('/add-to-cart', async (req, res) => {
-    const userId = req.user._id; // Assuming you have the user ID from authentication
+    // Assuming userId can be obtained from either request body or headers
+    console.log('Received request to add to cart:', req.body);
+    const userId = req.body.userId || req.headers['user-id'];
+
+    if (!userId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
     const productId = req.body.productId;
     const quantity = req.body.quantity;
 
     try {
+        console.log('Adding product to cart:', { productId, quantity });
         // Check if the user already has a cart, if not, create a new one
         let cart = await Cart.findOne({ userId });
 
@@ -72,16 +102,6 @@ router.post('/add-to-cart', async (req, res) => {
         } else {
             // Product doesn't exist, add it to the cart
             cart.products.push({ productId, quantity });
-
-            // Create and save the product in the database
-            const newProduct = new Product({
-                // Adjust this based on your product data
-                name: 'Product Name',
-                price: 100,
-                description: 'Product description'
-            });
-
-            await newProduct.save();
         }
 
         // Save the cart to the database
@@ -89,9 +109,11 @@ router.post('/add-to-cart', async (req, res) => {
 
         res.status(200).json({ message: 'Product added to cart.', cart });
     } catch (error) {
+        console.error('Error while adding to cart:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 
 // PUT endpoint to update product quantity in the cart
@@ -127,8 +149,13 @@ router.put('/update-quantity/:productId', async (req, res) => {
         const productId = req.params.productId;
         const updatedQuantity = req.body.quantity;
 
+        console.log('Updating quantity for product:', productId);
+        console.log('Updated quantity:', updatedQuantity);
+
         // Find the cart for the user
         const cart = await Cart.findOne({ userId });
+
+        console.log('User cart:', cart);
 
         // Check if the product is in the cart
         const productIndex = cart.products.findIndex(product => product.productId === productId);
@@ -138,14 +165,19 @@ router.put('/update-quantity/:productId', async (req, res) => {
             cart.products[productIndex].quantity = updatedQuantity;
             await cart.save();
 
+            console.log('Cart updated successfully.');
+
             res.status(200).json({ message: 'Cart updated.' });
         } else {
+            console.log('Product not found in the cart.');
             res.status(404).json({ message: 'Product not found in the cart.' });
         }
     } catch (error) {
+        console.error('Error updating quantity:', error);
         res.status(500).json({ message: 'Internal server error.' });
     }
 });
+
 
 router.get('/view-cart', async (req, res) => {
     try {

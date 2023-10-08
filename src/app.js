@@ -80,28 +80,145 @@ Logout Functionality:
 
 Implement a "logout" mechanism to destroy the session and redirect to the login view.
 To summarize, ensure you have implemented the user model, authentication strategies, endpoints for cart management, integrated MongoDB with the necessary collections, and updated the products router with the required endpoints. Additionally, implement views to interact with the application and consider role-based access as needed.
+
+TASTING USING POSTMAN User Endpoints:
+
+1)Register a new user.
+Log in with the registered user.
+Test the "current user" endpoint.
+
+2)Cart Endpoints:
+Add products to the cart.
+Update product quantities in the cart.
+Remove products from the cart.
+View the cart contents.
+
+3)Product Endpoints:
+Retrieve a list of products.
+View details of individual products.
+
+4)Admin Endpoint:
+Access the admin dashboard (if applicable).
+
+5)Logout Endpoint:
+Test the logout functionality.
+
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe222@example.com",
+  "age": 30,
+  "password": "doe222"
+}
+
+admin
+Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1MjMwMjgwZGNlOWNjZDA5MWZmZWFhNiIsImlhdCI6MTY5Njc5MzIxNiwiZXhwIjoxNjk2Nzk2ODE2fQ.KSluVlnu25PylCs_gIUsToGTITrk8evUAghWud3dlsI
+}
+Authorization
+Certainly! Here are the Postman paths for the endpoints in your provided code:
+
+1)List Products with Pagination, Filtering, and Sorting (GET):
+
+Method: GET
+Path: http://localhost:8080/products
+Query Parameters:
+page: (Optional) Page number for pagination
+limit: (Optional) Limit for pagination
+
+2)View Individual Product Details (GET):
+
+Method: GET
+Path: http://localhost:8080/products/{productId}
+Replace {productId} with the actual product ID you want to view
+
+3)Add Product to Cart (POST):
+
+Method: POST
+Path: http://localhost:8080/products/add-to-cart
+Request Body (JSON):
+json
+Copy code
+{
+  "productId": "product_id_here",
+  "quantity": 1
+}
+Replace "product_id_here" with the actual product ID you want to add to the cart.
+
+4)Update Product Quantity in Cart (PUT):
+
+Method: PUT
+Path: http://localhost:8080/products/update-cart/{productId}
+Replace {productId} with the actual product ID you want to update in the cart
+Request Body (JSON):
+json
+Copy code
+{
+  "quantity": 2
+}
+Replace 2 with the updated quantity.
+
+5)Update Product Quantity in Cart using Quantity Endpoint (PUT):
+
+Method: PUT
+Path: http://localhost:8080/products/update-quantity/{productId}
+Replace {productId} with the actual product ID you want to update the quantity
+Request Body (JSON):
+json
+Copy code
+{
+  "quantity": 3
+}
+Replace 3 with the updated quantity.
+
+6)View Cart Contents (GET):
+
+Method: GET
+Path: http://localhost:8080/products/view-cart
+
+7)Remove Product from Cart (DELETE):
+
+Method: DELETE
+Path: http://localhost:8080/products/remove-from-cart/{productId}
+Replace {productId} with the actual product ID you want to remove from the cart.
+Make sure to replace {productId} and "product_id_here" with the actual product IDs you want to use. Also, adjust the base URL (http://localhost:8080) if your server is running on a different port or domain.
+
+
+
+{
+    
+    "email": "leninadmin@example.com",
+    "password": "adminpassword"
+
+}
+
 */
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
-
 const passport = require('passport');
 const initializePassport = require('./config/passport.config');
 const usersRouter = require('./routes/users.router');
 const { JWT_SECRET } = require('./config/config'); // Ensure you have a config file for your JWT secret
-const configurePassport = require('./config/passport.config')
+const configurePassport = require('./config/passport.config');
 const cookieParser = require('cookie-parser');
-
-// Import the connectDB function from db.js
-const connectDB = require('./db');
-
+const User  = require('./models/User');
+const productsRouter = require('./routes/products.router')
+const cartRoutes = require('./routes/cart.router')
+const authenticateUser = require('./authenticateUser')
 const path = require('path');
+
 const app = express();
 
 
-app.set('view engine', 'ejs'); // Change 'ejs' to your desired view engine
+const connectDB = require('./db');
+
+connectDB();
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 // Body parsing middlewares
 app.use(express.json());
@@ -111,28 +228,21 @@ app.use(express.urlencoded({ extended: true }));
 // Initialize Passport
 initializePassport();
 
-connectDB();
+// Configure Passport
+configurePassport();
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
+// Use session
 app.use(session({
     secret: 'coderhouse',
     resave: false,
     saveUninitialized: true,
 }));
 
-app.use(passport.initialize());
-
+// Use cookie parser
 app.use(cookieParser());
 
-// Configure Passport
-configurePassport();
-
-
-
-// Authentication Routes
-app.use('/users', usersRouter);
+// Initialize Passport
+app.use(passport.initialize());
 
 // JWT Authentication Route
 const jwtOptions = {
@@ -160,15 +270,28 @@ passport.use(
       return done(error, false);
     }
   })
-)
-app.get('/', (req, res) => {
-  res.render('home');  // Render the home view when accessing '/'
-});
+);
+
+
+// Authentication Routes
+app.use('/users', usersRouter);
+app.use('/products', productsRouter);
+
+// Use the authentication middleware
+app.use(authenticateUser);
+
+// Use the cart routes
+app.use('/cart', cartRoutes); 
+
 
 // JWT Authentication Route
 app.post('/login', passport.authenticate('login', { session: false }), (req, res) => {
     const token = req.user.generateJWT();
     res.json({ token });
+});
+
+app.get('/', (req, res) => {
+  res.render('home');  // Render the home view when accessing '/'
 });
 
 app.listen(8080, () => {

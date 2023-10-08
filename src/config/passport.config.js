@@ -5,6 +5,7 @@ const { User } = require('../models/User');
 const { JWT_SECRET } = require('../config/config');
 const { isValidatePassword } = require('../utils');
 
+
 const cookieExtractor = (req) => {
   let token = null;
   if (req && req.cookies) {

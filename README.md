@@ -76,15 +76,25 @@ This will initiate the server, and it will start listening on the specified port
 ## Endpoints Overview
 
 ### POST: users/login
-![POST: users/login](./public/img/post-users-login.jpg)
+![POST: users/login](./public/img/users/post-users-login.jpg)
 ### POST: users/register
-![POST: users/register](./public/img/post-users-register.jpg)
+![POST: users/register](./public/img/users/post-users-register.jpg)
 ### GET: users/api/sessions/register
-![GET: users/api/sessions/register](./public/img/get-users-api-sessions-current.jpg)
+![GET: users/api/sessions/register](./public/img/users/get-users-api-sessions-current.jpg)
 ### GET: uusers/logout
-![GET: users/logout](./public/img/get-users-logout.jpg)
+![GET: users/logout](./public/img/users/get-users-logout.jpg)
 ## MongoDB Atlas Collections
-![MongoDB Atlas Collections](./public/img/MOGODB-ATLAS.jpg)
+![MongoDB Atlas Collections](./public/img/users/MOGODB-ATLAS.jpg)
+### GET: /:productId
+![GET: /:productId](./public/img/products/get-productId.jpg)
+### GET: products/limit and page
+![GET: products/limit and page](./public/img/products/get-products-page-limit.jpg)
+### POST: add-to-cart
+![POST: add-to-cart](./public/img/products/pst-products-add.jpg)
+
+### Mongodb Atlas Collections
+![GIF Demo](https://example.com/path/to/your/gif.gif)
+
 ## Contact
 
 For further inquiries or assistance, please reach out to:

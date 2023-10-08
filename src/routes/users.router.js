@@ -17,43 +17,43 @@ router.get('/', (req, res) => {
 
 // Registration Page
 router.post('/register', async (req, res) => {
-    try {
-        const { firstName, lastName, email, age, password } = req.body;
+  try {
+      const { firstName, lastName, email, age, password, role } = req.body;
 
-        if (!firstName || !lastName || !email || !age || !password) {
-            return res.status(400).send('Missing data.');
-        }
+      if (!firstName || !lastName || !email || !age || !password) {
+          return res.status(400).send('Missing data.');
+      }
 
-        const existingUser = await User.findOne({ email });
+      // Validate role
+      const validRoles = ['user', 'admin'];
+      const selectedRole = validRoles.includes(role) ? role : 'user';
 
-        if (existingUser) {
-            return res.status(400).send('User with this email already exists.');
-        }
-        
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
+      const existingUser = await User.findOne({ email });
 
-        const user = await User.create({
-            firstName,
-            lastName,
-            email,
-            age,
-            password: hashedPassword,
-            role: 'user' 
-        });
+      if (existingUser) {
+          return res.status(400).send('User with this email already exists.');
+      }
+      
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Generate JWT token after successfully creating the user
-        const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+      const user = await User.create({
+          firstName,
+          lastName,
+          email,
+          age,
+          password: hashedPassword,
+          role: selectedRole  // Use the selected role
+      });
 
-        // Send the token as a response
-        return res.status(200).json({ token });
+      // Generate JWT token after successfully creating the user
+      const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
 
-        // Or if you want to redirect to login
-        // res.redirect('/login');
-    } catch (error) {
-        console.error('Error during registration: ', error);
-        return res.status(500).send('Internal server error');
-    }
+      return res.status(200).json({ token });
+  } catch (error) {
+      console.error('Error during registration: ', error);
+      return res.status(500).send('Internal server error');
+  }
 });
 
 
@@ -87,19 +87,8 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Example route where only admins can access
-router.get('/admin-dashboard', (req, res) => {
-  if (req.user.role === 'admin') {
-    // Allow access to admin dashboard
-    res.status(200).send('Welcome to the admin dashboard.');
-  } else {
-    // Restrict access for non-admin users
-    res.status(403).send('Access denied. Only admins allowed.');
-  }
-});
 
-  
-  
+
 // User Logout
 router.get('/logout', async (req, res) => {
     console.log('Logout initiated.');
@@ -112,6 +101,30 @@ router.get('/logout', async (req, res) => {
         res.redirect('/');
     });
 });
+
+// Example route where only admins can access
+router.get('/admin-dashboard', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  console.log('Requesting admin dashboard:', req.user);
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    console.log('User role:', user.role); // Add this line to log the user's role
+
+    if (user.role === 'admin') {
+      return res.status(200).send('Welcome to the admin dashboard.');
+    } else {
+      return res.status(403).send('Access denied. Only admins allowed.');
+    }
+  } catch (error) {
+    console.error('Error finding user:', error);
+    res.status(500).send('Internal server error.');
+  }
+});
+
 
 // API endpoint to get the current user based on JWT token
 
