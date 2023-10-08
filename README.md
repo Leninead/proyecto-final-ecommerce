@@ -100,7 +100,7 @@ This will initiate the server, and it will start listening on the specified port
 For further inquiries or assistance, please reach out to:
 
 **Lenin Acosta**
-- GitHub: [implementacion-login](https://github.com/Leninead/implementacion-login.git)
+- GitHub: [implementacion-login](https://github.com/Leninead/practica-integracion-ecommerce.git)
 - LinkedIn: [Profile](https://www.linkedin.com/in/lenin-acosta-b32b8a262/)
 - Email: [Lenin Acosta](mailto:leninacosta2107@gmail.com)
 
