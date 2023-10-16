@@ -41,9 +41,10 @@ const configurePassport = () => {
 
   // JWT Strategy
   const jwtOptions = {
-    jwtFromRequest: cookieExtractor, // Use the cookie extractor here
-    secretOrKey: JWT_SECRET
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_SECRET, // Use process.env.JWT_SECRET here
   };
+  
 
   passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {

@@ -113,8 +113,14 @@ const addProduct = async (req, res) => {
         const productId = req.params.productId;
         const updatedQuantity = req.body.quantity;
 
+        console.log('Received request to update cart. User ID:', userId);
+        console.log('Product ID:', productId);
+        console.log('Updated quantity:', updatedQuantity);
+
         // Find the cart for the user
         const cart = await Cart.findOne({ userId });
+
+        console.log('User cart:', cart);
 
         // Check if the product is in the cart
         const productIndex = cart.products.findIndex(product => product.productId === productId);
@@ -124,14 +130,19 @@ const addProduct = async (req, res) => {
             cart.products[productIndex].quantity = updatedQuantity;
             await cart.save();
 
+            console.log('Cart updated successfully.');
+
             res.status(200).json({ message: 'Cart updated.' });
         } else {
+            console.log('Product not found in the cart.');
             res.status(404).json({ message: 'Product not found in the cart.' });
         }
     } catch (error) {
+        console.error('Error updating cart:', error);
         res.status(500).json({ message: 'Internal server error.' });
     }
-  };
+};
+
 
   const updateQuantityProductId = async (req, res) => {
     try {
