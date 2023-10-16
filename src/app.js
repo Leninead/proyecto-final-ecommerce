@@ -201,13 +201,13 @@ const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const passport = require('passport');
 const initializePassport = require('./config/passport.config');
 const usersRouter = require('./routes/users.router');
-const { JWT_SECRET } = require('./config/config'); // Ensure you have a config file for your JWT secret
 const configurePassport = require('./config/passport.config');
 const cookieParser = require('cookie-parser');
 const User  = require('./models/User');
 const productsRouter = require('./routes/products.router')
 const cartRoutes = require('./routes/cart.router')
 const authenticateUser = require('./authenticateUser')
+require('dotenv').config(); 
 const path = require('path');
 
 const app = express();
@@ -244,7 +244,7 @@ app.use(cookieParser());
 // Initialize Passport
 app.use(passport.initialize());
 
-// JWT Authentication Route
+// JWT Authentication Route using .env
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromExtractors([
     ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -255,8 +255,10 @@ const jwtOptions = {
       return null;
     },
   ]),
-  secretOrKey: JWT_SECRET,
+  secretOrKey: process.env.JWT_SECRET, // Use process.env.JWT_SECRET here
 };
+
+
 passport.use(
   new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {

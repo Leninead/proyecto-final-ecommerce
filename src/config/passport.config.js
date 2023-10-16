@@ -75,15 +75,3 @@ const configurePassport = () => {
 
 module.exports = configurePassport;
 
-
-
-
-
-
-
-
-
-
-
-
-
