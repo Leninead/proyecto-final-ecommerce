@@ -78,21 +78,19 @@ const bodyParser = require('body-parser');
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const passport = require('passport');
 const initializePassport = require('./config/passport.config');
-const usersRouter = require('./routes/users.router');
 const configurePassport = require('./config/passport.config');
 const cookieParser = require('cookie-parser');
-const User  = require('./models/User');
-const productsRouter = require('./routes/products.router')
-const cartRoutes = require('./routes/cart.router')
-require('dotenv').config(); 
-
+const User = require('./models/User');
+const productsRouter = require('./routes/products.router');
+const cartRoutes = require('./routes/cart.router');
+const usersRouter = require('./routes/users.router')
+require('dotenv').config();
 
 const path = require('path');
 
 const app = express();
 
 const authRouter = require('./routes/auth');
-
 
 const connectDB = require('./db');
 
@@ -113,11 +111,13 @@ initializePassport();
 configurePassport();
 
 // Use session
-app.use(session({
+app.use(
+  session({
     secret: 'coderhouse',
     resave: false,
     saveUninitialized: true,
-}));
+  })
+);
 
 // Use cookie parser
 app.use(cookieParser());
@@ -139,7 +139,6 @@ const jwtOptions = {
   secretOrKey: process.env.JWT_SECRET, // Use process.env.JWT_SECRET here
 };
 
-
 passport.use(
   new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {
@@ -155,37 +154,33 @@ passport.use(
   })
 );
 
+// cart route
+app.use('/cart', cartRoutes);
 
-// Authentication Routes
-app.use('/users', usersRouter);
+
 app.use('/products', productsRouter);
 
-
-
-
-// Use the authentication middleware
-const authenticateUser = require('./middleware/authenticateUser');
-
-app.use(authenticateUser);
-
-// cart route
-app.use('/cart', cartRoutes); 
+// Use the user routes
+app.use('/users', usersRouter);
 
 // authentication routes
-app.use('/auth', require('./routes/auth'))
+app.use('/auth', authRouter);
+
 
 
 // JWT Authentication Route
 app.post('/login', passport.authenticate('login', { session: false }), (req, res) => {
   const token = req.user.generateJWT();
-  console.log('Token:', token);  // Add this line to log the token
+  console.log('Token:', token); // Add this line to log the token
   res.json({ token });
 });
 
+// Add your other routes here
+
 app.get('/', (req, res) => {
-  res.render('home');  // Render the home view when accessing '/'
+  res.render('home'); // Render the home view when accessing '/'
 });
 
 app.listen(8080, () => {
-    console.log('Server running on port 8080');
+  console.log('Server running on port 8080');
 });

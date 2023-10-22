@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
+const passport = require('passport');
 
 // Authentication middleware
-const authenticateUser = require('../middleware/authenticateUser');
+const jwtAuthMiddleware = passport.authenticate('jwt', { session: false });
 
 // Route to handle product listing with pagination, filtering, and sorting
 router.get('/', productController.paginationFilteringSorting);
@@ -15,14 +16,14 @@ router.post('/add-product', productController.addProduct);
 router.post('/add-to-cart', productController.addToCart);
 
 // PUT endpoint to update product quantity in the cart
-router.put('/update-cart/:productId', authenticateUser, productController.updateCartProductId);
+router.put('/update-cart/:productId', jwtAuthMiddleware, productController.updateCartProductId);
 
 // PUT endpoint to update product quantity in the cart using a quantity endpoint
-router.put('/update-quantity/:productId', authenticateUser, productController.updateQuantityProductId);
+router.put('/update-quantity/:productId', jwtAuthMiddleware, productController.updateQuantityProductId);
 
-router.get('/view-cart', authenticateUser, productController.viewCart);
+router.get('/view-cart', jwtAuthMiddleware, productController.viewCart);
 
 // DELETE endpoint to remove a product from the cart
-router.delete('/remove-from-cart/:productId', authenticateUser, productController.removeFromCartProductId);
+router.delete('/remove-from-cart/:productId', jwtAuthMiddleware, productController.removeFromCartProductId);
 
 module.exports = router;

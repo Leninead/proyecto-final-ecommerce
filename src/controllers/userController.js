@@ -32,7 +32,10 @@ const registerUser = async (req, res) => {
       role: selectedRole
     });
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });
+    // In userController.js
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log('Generated token:', token);
+    
 
     return res.status(200).json({ token });
   } catch (error) {
@@ -42,7 +45,10 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+  console.log('Login user function called'); // Add this line
   const { email, password } = req.body;
+  console.log('Email:', email); // Add this line
+  console.log('Password:', password);
 
   try {
     const user = await User.findOne({ email });

@@ -4,16 +4,27 @@ const passport = require('passport');
 const userController = require('../controllers/userController');
 
 // Authentication middleware
-const authenticateUser = require('../middleware/authenticateUser');
+const jwtAuthMiddleware = passport.authenticate('jwt', { session: false });
 
 router.get('/', (req, res) => {
   res.render('home'); // Renders views/home.ejs
 });
 
 router.post('/register', userController.registerUser);
-router.post('/login', userController.loginUser);
+
+router.post('/login', (req, res) => {
+  console.log('Login route reached'); 
+  userController.loginUser(req, res);
+});
+
 router.get('/logout', userController.logoutUser);
-router.get('/admin-dashboard', authenticateUser, passport.authenticate('jwt', { session: false }), userController.adminDashboard);
-router.get('/api/sessions/current', authenticateUser, userController.getCurrentUser);
+
+// Protected route for admin dashboard
+router.get('/admin-dashboard', jwtAuthMiddleware, userController.adminDashboard);
+
+// Protected route to get current user
+router.get('/api/sessions/current', jwtAuthMiddleware, userController.getCurrentUser);
 
 module.exports = router;
+
+
