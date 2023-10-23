@@ -70,6 +70,36 @@ If you encounter any issues or have specific questions while testing, feel free 
 
 }
 
+1)/ - GET Request:
+
+Express Route: router.get('/')
+Postman Path: GET http://localhost:8080/
+
+2)/register - POST Request:
+
+Express Route: router.post('/register', userController.registerUser)
+Postman Path: POST http://localhost:8080/users/register
+
+3)/login - POST Request:
+
+Express Route: router.post('/login', userController.loginUser)
+Postman Path: POST http://localhost:8080/users/login
+
+4)/logout - GET Request:
+
+Express Route: router.get('/logout', userController.logoutUser)
+Postman Path: GET http://localhost:8080/users/logout
+
+5)/admin-dashboard - GET Request:
+
+Express Route: router.get('/admin-dashboard', jwtAuthMiddleware, userController.adminDashboard)
+Postman Path: GET http://localhost:8080/users/admin-dashboard
+
+6)/api/sessions/current - GET Request:
+
+Express Route: router.get('/api/sessions/current', jwtAuthMiddleware, userController.getCurrentUser)
+Postman Path: GET http://localhost:8080/users/api/sessions/current
+
 */
 const express = require('express');
 const mongoose = require('mongoose');
@@ -131,7 +161,8 @@ const jwtOptions = {
     ExtractJwt.fromAuthHeaderAsBearerToken(),
     (req) => {
       if (req && req.cookies) {
-        return req.cookies['your-cookie-name']; // Adjust your cookie name
+        return req.cookies['jwt'];
+      
       }
       return null;
     },
@@ -175,7 +206,6 @@ app.post('/login', passport.authenticate('login', { session: false }), (req, res
   res.json({ token });
 });
 
-// Add your other routes here
 
 app.get('/', (req, res) => {
   res.render('home'); // Render the home view when accessing '/'
