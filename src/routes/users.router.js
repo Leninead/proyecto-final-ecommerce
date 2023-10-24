@@ -12,11 +12,18 @@ router.get('/', (req, res) => {
 
 router.post('/register', userController.registerUser);
 
+router.get('/register', (req, res) => {
+  res.render('register');
+});
+
 router.post('/login', (req, res) => {
   console.log('Login route reached'); 
   userController.loginUser(req, res);
 });
 
+router.get('/login', (req, res) => {
+  res.render('login');
+});
 router.get('/logout', userController.logoutUser);
 
 // Protected route for admin dashboard
