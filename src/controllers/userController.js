@@ -37,7 +37,7 @@ const registerUser = async (req, res) => {
     console.log('Generated token:', token);
     
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ message: 'Registration successful!' }); // Change this line
   } catch (error) {
     console.error('Error during registration: ', error);
     return res.status(500).send('Internal server error');
@@ -45,10 +45,7 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  console.log('Login user function called'); // Add this line
   const { email, password } = req.body;
-  console.log('Email:', email); // Add this line
-  console.log('Password:', password);
 
   try {
     const user = await User.findOne({ email });
@@ -63,12 +60,15 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Incorrect password.' });
     }
 
-    return res.status(200).json({ message: 'Login successful!' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    return res.status(200).json({ token });
   } catch (error) {
     console.error('Error during login:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 const logoutUser = async (req, res) => {
   console.log('Logout initiated.');
