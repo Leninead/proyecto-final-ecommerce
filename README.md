@@ -74,26 +74,19 @@ This will initiate the server, and it will start listening on the specified port
 
 
 ## Endpoints Overview
-
-### POST: users/login
-![POST: users/login](./public/img/users/post-users-login.jpg)
-### POST: users/register
-![POST: users/register](./public/img/users/post-users-register.jpg)
-### GET: users/api/sessions/register
-![GET: users/api/sessions/register](./public/img/users/get-users-api-sessions-current.jpg)
-### GET: uusers/logout
-![GET: users/logout](./public/img/users/get-users-logout.jpg)
-## MongoDB Atlas Collections
-![MongoDB Atlas Collections](./public/img/users/MOGODB-ATLAS.jpg)
-### GET: /:productId
-![GET: /:productId](./public/img/products/get-productId.jpg)
-### GET: products/limit and page
-![GET: products/limit and page](./public/img/products/get-products-page-limit.jpg)
-### POST: add-to-cart
-![POST: add-to-cart](./public/img/products/pst-products-add.jpg)
+### GET: /
+![GET: /](./public/img/users/get-home.jpg)
+### GET: users/register
+![GET: users/register](./public/img/users/get-users-register-browser.jpg)
+### GET: users/register
+![GET: users/register](./public/img/users/token-users-register.jpg)
+### GET: users/login
+![GET: users/login](./public/img/users/login-users-form.jpg)
+### GET: users/login
+![POST: users/login](./public/img/users//login-exitoso-form.jpg)
 
 ### Mongodb Atlas Collections
-![GIF Demo](https://example.com/path/to/your/gif.gif)
+![GIF Demo](./public/gif/mongodb-atlas-collections.gif)
 
 ## Contact
 
