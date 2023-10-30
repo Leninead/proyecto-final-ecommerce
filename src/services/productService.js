@@ -1,24 +1,45 @@
-const productDAO = require('../dao/productDAO');
+const ProductDAO = require('../dao/productDAO');
 
-const getAllProducts = async () => {
-  try {
-    const products = await productDAO.getAllProducts();
-    return products;
-  } catch (error) {
-    throw new Error('Error getting products: ' + error.message);
+class ProductService {
+  static async createProduct(productData) {
+    try {
+      return await ProductDAO.createProduct(productData);
+    } catch (error) {
+      throw error;
+    }
   }
-};
 
-const getProductById = async (productId) => {
-  try {
-    const product = await productDAO.getProductById(productId);
-    return product;
-  } catch (error) {
-    throw new Error('Error getting product: ' + error.message);
+  static async getAllProducts() {
+    try {
+      return await ProductDAO.getAllProducts();
+    } catch (error) {
+      throw error;
+    }
   }
-};
 
-module.exports = {
-  getAllProducts,
-  getProductById,
-};
+  static async getProductById(productId) {
+    try {
+      return await ProductDAO.getProductById(productId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateProduct(productId, updatedData) {
+    try {
+      return await ProductDAO.updateProduct(productId, updatedData);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async deleteProduct(productId) {
+    try {
+      return await ProductDAO.deleteProduct(productId);
+    } catch (error) {
+      throw error;
+    }
+  }
+}
+
+module.exports = ProductService;

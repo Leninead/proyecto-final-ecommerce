@@ -1,24 +1,22 @@
 const cartDAO = require('../dao/cartDAO');
 
-const getCartByUserId = async (userId) => {
-  try {
-    const cart = await cartDAO.getCartByUserId(userId);
-    return cart;
-  } catch (error) {
-    throw new Error('Error getting cart: ' + error.message);
-  }
-};
+// Create a new cart for a user
+async function createCart(user) {
+    return await cartDAO.createCart(user);
+}
 
-const updateCart = async (userId, updatedProducts) => {
-  try {
-    await cartDAO.updateCart(userId, updatedProducts);
-  } catch (error) {
-    throw new Error('Error updating cart: ' + error.message);
-  }
-};
+// Find a user's cart by user ID
+async function findCartByUser(userId) {
+    return await cartDAO.findCartByUser(userId);
+}
+
+// Update the cart's products
+async function updateCartProducts(cartId, products) {
+    return await cartDAO.updateCartProducts(cartId, products);
+}
 
 module.exports = {
-  getCartByUserId,
-  updateCart,
+    createCart,
+    findCartByUser,
+    updateCartProducts
 };
- 

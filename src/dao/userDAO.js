@@ -2,6 +2,10 @@ const User = require('../models/user.model');
 
 const createUser = async (user) => {
   try {
+    if (!user || !user.email || !user.password) {
+      throw new Error('Invalid user data');
+    }
+
     const createdUser = await User.create(user);
     return createdUser;
   } catch (error) {
@@ -11,6 +15,10 @@ const createUser = async (user) => {
 
 const getUserByEmail = async (email) => {
   try {
+    if (!email) {
+      throw new Error('Invalid email');
+    }
+
     const user = await User.findOne({ email });
     return user;
   } catch (error) {

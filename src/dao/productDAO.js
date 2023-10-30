@@ -1,24 +1,46 @@
 const Product = require('../models/product.model');
 
-const getAllProducts = async () => {
-  try {
-    const products = await Product.find();
-    return products;
-  } catch (error) {
-    throw new Error('Error getting products: ' + error.message);
+class ProductDAO {
+  static async createProduct(productData) {
+    try {
+      const newProduct = new Product(productData);
+      return await newProduct.save();
+    } catch (error) {
+      throw error;
+    }
   }
-};
 
-const getProductById = async (productId) => {
-  try {
-    const product = await Product.findById(productId);
-    return product;
-  } catch (error) {
-    throw new Error('Error getting product: ' + error.message);
+  static async getAllProducts() {
+    try {
+      return await Product.find();
+    } catch (error) {
+      throw error;
+    }
   }
-};
 
-module.exports = {
-  getAllProducts,
-  getProductById,
-};
+  static async getProductById(productId) {
+    try {
+      return await Product.findById(productId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async updateProduct(productId, updatedData) {
+    try {
+      return await Product.findByIdAndUpdate(productId, updatedData, { new: true });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async deleteProduct(productId) {
+    try {
+      await Product.findByIdAndDelete(productId);
+    } catch (error) {
+      throw error;
+    }
+  }
+}
+
+module.exports = ProductDAO;

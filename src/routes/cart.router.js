@@ -1,19 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const cartController = require('../controllers/cartController');
-const passport = require('passport');
 
-// Authentication middleware
-const jwtAuthMiddleware = passport.authenticate('jwt', { session: false });
+// Define routes for cart-related operations
+// Define a route handler with a callback function
+router.get('/', (req, res) => {
+    // Handle the GET request for this route
+    res.send('Hello, this is the cart route.');
+});
 
-// PUT endpoint to update product quantity in the cart
-router.put('/update-cart/:productId', jwtAuthMiddleware, cartController.updateCart);
+router.get('/:userId', cartController.getCart); // This line is added
 
-// DELETE endpoint to remove a product from the cart
-router.delete('/remove-from-cart/:productId', jwtAuthMiddleware, cartController.removeFromCart);
-
-// GET endpoint logic for viewing the cart
-router.get('/view-cart', jwtAuthMiddleware, cartController.viewCart);
+router.post('/:cartId/products', cartController.addProductToCart);
+router.put('/:cartId/products/:productId', cartController.updateProductQuantity);
+router.delete('/:cartId/products/:productId', cartController.removeProductFromCart);
+router.delete('/:cartId', cartController.clearCart);
 
 module.exports = router;
-

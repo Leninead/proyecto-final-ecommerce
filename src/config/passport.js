@@ -1,7 +1,7 @@
 const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
-const { User } = require('../models/User');
+const { User } = require('../models/user.model');
 const { isValidatePassword } = require('../utils');
 const { JWT_SECRET } = require('../config/config');
 
@@ -44,7 +44,7 @@ const configurePassport = () => {
       ExtractJwt.fromAuthHeaderAsBearerToken(),
       cookieExtractor, // Add the cookieExtractor here
     ]),
-    secretOrKey: process.env.JWT_SECRET, // Use process.env.JWT_SECRET here
+    secretOrKey: JWT_SECRET, // Use the JWT_SECRET from your environment variables
   };
   
   passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
@@ -58,8 +58,7 @@ const configurePassport = () => {
     } catch (error) {
       return done(error, false);
     }
-  }));
-  
+  }))
 }
-module.exports = configurePassport;
 
+module.exports = configurePassport;

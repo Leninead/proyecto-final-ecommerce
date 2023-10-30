@@ -17,13 +17,13 @@ router.get('/register', (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  console.log('Login route reached'); 
   userController.loginUser(req, res);
 });
 
 router.get('/login', (req, res) => {
   res.render('login');
 });
+
 router.get('/logout', userController.logoutUser);
 
 // Protected route for admin dashboard
@@ -33,5 +33,3 @@ router.get('/admin-dashboard', jwtAuthMiddleware, userController.adminDashboard)
 router.get('/api/sessions/current', jwtAuthMiddleware, userController.getCurrentUser);
 
 module.exports = router;
-
-
