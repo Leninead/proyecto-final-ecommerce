@@ -75,8 +75,12 @@ const mongoose = require('mongoose');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
-const passport = require('passport'); // Only one passport import needed
 
+const passport = require('passport'); // Import Passport
+const passportConfig = require('./config/passport');
+
+
+passportConfig(passport);
 // Load environment variables from .env
 dotenv.config();
 
@@ -114,12 +118,11 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize Passport (Ensure Passport initialization is done in authController.js)
-const authController = require('./authController');
-authController.initializePassport();
+
 
 // Use Passport middleware
 app.use(passport.initialize());
+// app.use(passport.session());
 
 // Include your routes (Update routes to match your project structure)
 const cartRoutes = require('./routes/cart.router');

@@ -8,6 +8,7 @@ class UserController {
       const { firstName, lastName, email, password } = req.body;
   
       if (!firstName || !lastName || !email || !password) {
+        console.log('Incomplete registration data')
         return res.status(400).json({ message: 'Incomplete registration data' });
       }
   

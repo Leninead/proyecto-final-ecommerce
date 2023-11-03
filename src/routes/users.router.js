@@ -6,30 +6,30 @@ const userController = require('../controllers/userController');
 // Authentication middleware
 const jwtAuthMiddleware = passport.authenticate('jwt', { session: false });
 
+// Home route
 router.get('/', (req, res) => {
   res.render('home'); // Renders views/home.ejs
 });
 
-router.post('/register', userController.registerUser);
+// Register a user (POST /register)
+router.post('/register', (req, res) => userController.registerUser(req, res));
 
-router.get('/register', (req, res) => {
-  res.render('register');
-});
+// Log in a user (POST /login)
+router.post('/login', (req, res) => userController.loginUser(req, res));
 
-router.post('/login', (req, res) => {
-  userController.loginUser(req, res);
-});
+// Log out a user (POST /logout)
+router.post('/logout', (req, res) => userController.logoutUser(req, res));
 
-router.get('/login', (req, res) => {
-  res.render('login');
-});
+// Admin dashboard route (GET /admin)
+router.get('/admin', jwtAuthMiddleware, (req, res) => userController.adminDashboard(req, res));
 
-router.get('/logout', userController.logoutUser);
+// Get current user (GET /user)
+router.get('/user', jwtAuthMiddleware, (req, res) => userController.getCurrentUser(req, res));
 
-// Protected route for admin dashboard
-router.get('/admin-dashboard', jwtAuthMiddleware, userController.adminDashboard);
+// Protected route for the admin dashboard (GET /admin-dashboard)
+router.get('/admin-dashboard', jwtAuthMiddleware, (req, res) => userController.adminDashboard(req, res));
 
-// Protected route to get current user
-router.get('/api/sessions/current', jwtAuthMiddleware, userController.getCurrentUser);
+// Protected route to get the current user (GET /api/sessions/current)
+router.get('/api/sessions/current', jwtAuthMiddleware, (req, res) => userController.getCurrentUser(req, res));
 
 module.exports = router;
