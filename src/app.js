@@ -75,7 +75,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
-
+const authenticationMiddleware = require('./middlewares/authentication');
 const passport = require('passport'); // Import Passport
 const passportConfig = require('./config/passport');
 
@@ -87,6 +87,9 @@ dotenv.config();
 console.log(`Server is running on port ${process.env.PORT}`);
 console.log(`MongoDB URI: ${process.env.MONGODB_URI}`);
 console.log(`JWT Secret: ${process.env.JWT_SECRET}`);
+
+// Use the authentication middleware globally for all routes
+app.use(authenticationMiddleware);
 
 
 // Initialize the Express app

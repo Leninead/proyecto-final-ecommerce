@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const cartService = require('../services/cartService');
-
+const CartRepository = require('../Repository/cartRepository');
+const UserService = require('../services/userService');
+const cartUtils = require('../utils/cartUtils');
 // Create a new cart for a user
 const createCart = async (req, res) => {
     const { userId } = req.body;
@@ -134,11 +136,48 @@ const clearCart = async (req, res) => {
 };
 
 
+async function purchaseCart(req, res) {
+    try {
+        const cartId = req.params.cid;
+        const userId = req.user._id; // Assuming user information is available through authentication
+
+        const cart = await CartRepository.getCartById(cartId);
+        if (!cart) {
+            return res.status(404).json({ message: 'Cart not found' });
+        }
+
+        // Calculate the total cost of the items in the cart using cartUtils
+        const totalCost = cartUtils.calculateTotalCost(cart.products);
+
+        // Check if the user has sufficient funds
+        const user = await UserService.getUserById(userId);
+
+        if (user.balance < totalCost) {
+            return res.status(403).json({ message: 'Insufficient funds' });
+        }
+
+        // Create and save tickets, update product stock, update user balance, and clear the cart
+        const tickets = cartUtils.createTicketsFromCart(cart.products);
+        cartUtils.updateProductStock(cart.products);
+        cartUtils.updateUserBalance(userId, totalCost);
+        cartUtils.clearCartItems(cartId);
+
+        // Respond with a success message
+        res.json({ message: 'Purchase successful' });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+
+
 module.exports = {
     createCart,
     getCart,
     addProductToCart,
     updateProductQuantity,
     removeProductFromCart,
-    clearCart
+    clearCart,
+    purchaseCart,
+
 };

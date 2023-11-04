@@ -1,19 +1,18 @@
 const express = require('express');
 const router = express.Router();
+const cartService = require('../services/cartService');
 const cartController = require('../controllers/cartController');
+const UserService = require('../services/userService');
 
-// Define routes for cart-related operations
-// Define a route handler with a callback function
-router.get('/', (req, res) => {
-    // Handle the GET request for this route
-    res.send('Hello, this is the cart route.');
-});
-
-router.get('/:userId', cartController.getCart); // This line is added
-
+// Define your cart-related routes
+router.post('/', cartController.createCart);
+router.get('/:userId', cartController.getCart);
 router.post('/:cartId/products', cartController.addProductToCart);
 router.put('/:cartId/products/:productId', cartController.updateProductQuantity);
 router.delete('/:cartId/products/:productId', cartController.removeProductFromCart);
 router.delete('/:cartId', cartController.clearCart);
+
+// Add the purchase route
+router.post('/:cid/purchase', cartController.purchaseCart);
 
 module.exports = router;

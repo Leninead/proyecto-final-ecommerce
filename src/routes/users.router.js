@@ -6,6 +6,8 @@ const userController = require('../controllers/userController');
 // Authentication middleware
 const jwtAuthMiddleware = passport.authenticate('jwt', { session: false });
 
+// Define the route for the /current endpoint
+router.get('/current', authenticationMiddleware, userController.getCurrentUser);
 // Home route
 router.get('/', (req, res) => {
   res.render('home'); // Renders views/home.ejs

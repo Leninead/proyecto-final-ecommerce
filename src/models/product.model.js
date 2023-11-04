@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
-const productCollectionName = "products"; // Collection name
-
 const productSchema = new mongoose.Schema({
-    // Your product schema fields
-    // For example:
     name: {
         type: String,
         required: true,
@@ -19,17 +15,11 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     quantity: {
-      type: Number,
-      default: 0, // Default quantity value if not provided
+        type: Number,
+        default: 0,
     },
 });
 
-let Product;
-
-try {
-  Product = mongoose.model('Product');
-} catch (error) {
-  Product = mongoose.model('Product', productSchema, productCollectionName);
-}
+const Product = mongoose.model('Product', productSchema);
 
 module.exports = Product;

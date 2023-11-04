@@ -2,6 +2,9 @@ const UserService = require('../services/userService');
 const userService = new UserService();
 
 class UserController {
+
+  
+
   async registerUser(req, res) {
     try {
       // 1. Validate the user's registration data (ensure you have validation middleware)
@@ -110,16 +113,21 @@ class UserController {
     }
   }
   
+
+  
   async getCurrentUser(req, res) {
     try {
-      // Implement the logic for retrieving and returning the current user based on their session or JWT token.
-      // This route may be used for checking the user's authentication status.
-  
       // Check if the user is authenticated (you can use your authentication middleware)
       const user = req.user; // Assuming you have user information available through authentication middleware
+
       if (user) {
         // User is authenticated, return user data in the response
-        res.json(user);
+        const userDto = {
+          username: user.username,
+          email: user.email,
+          // Include other necessary data in the DTO
+        };
+        res.json(userDto);
       } else {
         // No user is authenticated, respond with a message
         res.status(401).json({ message: 'No user is authenticated' });
@@ -128,7 +136,6 @@ class UserController {
       res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
   }
-  
   // Add other user-related HTTP request handling here, such as updating user profiles, resetting passwords, etc.
 }
 
