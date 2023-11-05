@@ -111,7 +111,7 @@ const removeProductFromCart = async (req, res) => {
     }
 };
 
-// Clear the entire cart
+
 // Clear the entire cart
 const clearCart = async (req, res) => {
     const { cartId } = req.params;

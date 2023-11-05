@@ -88,12 +88,14 @@ console.log(`Server is running on port ${process.env.PORT}`);
 console.log(`MongoDB URI: ${process.env.MONGODB_URI}`);
 console.log(`JWT Secret: ${process.env.JWT_SECRET}`);
 
-// Use the authentication middleware globally for all routes
-app.use(authenticationMiddleware);
 
 
 // Initialize the Express app
 const app = express();
+
+// Use the authentication middleware globally for all routes
+app.use(authenticationMiddleware);
+
 
 // Set up the database connection (Use the MONGODB_URI from .env)
 mongoose.connect(process.env.MONGODB_URI, {

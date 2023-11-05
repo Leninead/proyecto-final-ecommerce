@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const userController = require('../controllers/userController');
+const authenticationMiddleware = require('../middlewares/authentication');
 
 // Authentication middleware
 const jwtAuthMiddleware = passport.authenticate('jwt', { session: false });
 
 // Define the route for the /current endpoint
-router.get('/current', authenticationMiddleware, userController.getCurrentUser);
+router.get('/current', authenticationMiddleware, (req, res) => userController.getCurrentUser(req, res));
+
 // Home route
 router.get('/', (req, res) => {
   res.render('home'); // Renders views/home.ejs
@@ -25,7 +27,7 @@ router.post('/logout', (req, res) => userController.logoutUser(req, res));
 // Admin dashboard route (GET /admin)
 router.get('/admin', jwtAuthMiddleware, (req, res) => userController.adminDashboard(req, res));
 
-// Get current user (GET /user)
+// Protected route to get the current user (GET /user)
 router.get('/user', jwtAuthMiddleware, (req, res) => userController.getCurrentUser(req, res));
 
 // Protected route for the admin dashboard (GET /admin-dashboard)
