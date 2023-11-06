@@ -78,16 +78,25 @@ const dotenv = require('dotenv');
 const authenticationMiddleware = require('./middlewares/authentication');
 const passport = require('passport'); // Import Passport
 const passportConfig = require('./config/passport');
+const emailRouter = require('./routes/email.router'); // Import your email router
+const twilio = require('twilio');
+const smsRouter = require('./routes/sms.router');
 
 
 passportConfig(passport);
+// Load environment variables from .env
+dotenv.config();
 // Load environment variables from .env
 dotenv.config();
 
 console.log(`Server is running on port ${process.env.PORT}`);
 console.log(`MongoDB URI: ${process.env.MONGODB_URI}`);
 console.log(`JWT Secret: ${process.env.JWT_SECRET}`);
+console.log(`Twilio Account SID: ${process.env.TWILIO_ACCOUNT_SID}`);
+console.log(`Twilio Auth Token: ${process.env.TWILIO_AUTH_TOKEN}`); // Add this line
 
+// Create the Twilio client
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN); // Set up Twilio client
 
 
 // Initialize the Express app
@@ -95,7 +104,10 @@ const app = express();
 
 // Use the authentication middleware globally for all routes
 app.use(authenticationMiddleware);
+// Use your email router
+app.use('/email', emailRouter);
 
+app.use('/sms', smsRouter);
 
 // Set up the database connection (Use the MONGODB_URI from .env)
 mongoose.connect(process.env.MONGODB_URI, {
@@ -118,6 +130,8 @@ app.use(cookieParser());
 // Set up EJS as the view engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+
 
 // Body parsing middleware
 app.use(express.json());
