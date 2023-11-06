@@ -127,10 +127,9 @@ app.use(
 // Use cookie parser
 app.use(cookieParser());
 
-// Set up EJS as the view engine
-app.set('views', path.join(__dirname, 'views'));
+// Configure view engine and views directory
 app.set('view engine', 'ejs');
-
+app.set('views', path.join(__dirname, 'views'));
 
 
 // Body parsing middleware
