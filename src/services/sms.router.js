@@ -10,7 +10,10 @@ console.log(`TWILIO_PHONE_NUMBER: ${process.env.TWILIO_PHONE_NUMBER}`);
 // Create the Twilio client only if the required environment variables are set
 let client;
 if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+  console.log('Twilio client will be created.');
   client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+} else {
+  console.log('Twilio client will not be created because environment variables are missing.');
 }
 
 // Define a route to send a thank you SMS

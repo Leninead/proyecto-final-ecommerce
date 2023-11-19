@@ -208,9 +208,7 @@ const emailRouter = require('./services/email.router');
 const smsRouter = require('./services/sms.router');
 const ticketRoutes = require('./routes/ticket.router');
 const connectDB = require('./db');
-require('./config/passport'); // Import passport configuration
 require('dotenv').config();
-require('dotenv').config({ path: 'twilio.env' });
 
 // Connect to the database
 connectDB();
