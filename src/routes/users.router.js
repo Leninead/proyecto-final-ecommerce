@@ -22,7 +22,9 @@ router.get('/profile', (req, res) => {
 
 
 // Register a user (POST /register)
-router.post('/register', (req, res) => userController.registerUser(req, res));
+router.post('/register', async (req, res) => {
+  await userController.registerUser(req, res);
+});
 
 // Log in a user (POST /login)
 router.post('/login', (req, res) => userController.loginUser(req, res));
