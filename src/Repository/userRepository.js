@@ -1,24 +1,22 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 
- 
 class UserRepository {
-    async createUser(user) {
-      try {
-        // Hash the user's password before storing it
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        user.password = hashedPassword;
-  
-        return await User.create(user);
-      } catch (error) {
-        throw new Error('Error creating user: ' + error.message);
-      }
+  async createUser(user) {
+    try {
+      // Hash the user's password before storing it
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      user.password = hashedPassword;
+
+      return await User.create(user);
+    } catch (error) {
+      throw new Error('Error creating user: ' + error.message);
     }
-  
-    // Add a method for verifying passwords
-    async verifyPassword(user, password) {
-      return bcrypt.compare(password, user.password);
-    }
+  }
+
+  async verifyPassword(user, password) {
+    return bcrypt.compare(password, user.password);
+  }
 
   async getUserByEmail(email) {
     try {

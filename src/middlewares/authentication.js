@@ -1,26 +1,29 @@
-// Import any necessary modules or dependencies here
 const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
 
-// Define your authentication middleware function
 function authenticationMiddleware(req, res, next) {
-  // Check for the user's credentials or token (e.g., JWT token)
-  const token = req.headers.authorization; // You can change this to fit your authentication method
+  const authHeader = req.headers.authorization;
 
-  // Validate the credentials or token
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('No Token Found - Unauthorized');
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
-  // If the token exists, you can verify it (e.g., for JWT)
-  jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
+  const token = authHeader.split(' ')[1];
+
+  // Log the received token for debugging
+  console.log('Received Token:', token);
+
+  jwt.verify(token, JWT_SECRET, (error, decodedUser) => {
     if (error) {
+      console.log('Token Verification Failed - Unauthorized');
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    // If the token is valid, you can attach user information to the req object
-    req.user = user;
+    // Log the decoded user for debugging
+    console.log('Decoded User:', decodedUser);
 
-    // Continue to the next middleware or route handler
+    req.user = decodedUser; // Set the decoded user in the request object
     next();
   });
 }

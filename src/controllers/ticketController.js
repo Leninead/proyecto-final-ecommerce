@@ -25,7 +25,6 @@ async function createTicket(req, res) {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 }
-const Ticket = require('../models/ticket.model');
 
 async function getTickets(req, res) {
     try {

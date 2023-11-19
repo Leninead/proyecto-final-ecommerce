@@ -22,6 +22,7 @@ async function findCartByUser(userId) {
 // Update the cart's products
 async function updateCartProducts(cartId, products) {
     try {
+        // Update only the products field in the cart
         return await Cart.findByIdAndUpdate(cartId, { products }, { new: true });
     } catch (error) {
         throw new Error('Failed to update the cart\'s products');

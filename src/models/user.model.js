@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
   role: { type: String, enum: ['user', 'admin'], default: 'user' }
 });
-
+6
 userSchema.methods.generateJWT = function () {
   try {
     const token = jwt.sign({ id: this._id }, JWT_SECRET, { expiresIn: '1h' });

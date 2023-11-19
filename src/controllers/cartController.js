@@ -113,29 +113,20 @@ const removeProductFromCart = async (req, res) => {
 
 
 // Clear the entire cart
-const clearCart = async (req, res) => {
+async function clearCart(req, res, next) {
     const { cartId } = req.params;
 
     try {
-        // Find the cart by ID
-        const cart = await cartService.findCartById(cartId);
-        if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
-        }
+        // Implement the logic to clear the cart using Cart model or other appropriate methods
+        await Cart.findByIdAndUpdate(cartId, { products: [] });
 
-        // Clear the products array in the cart
-        cart.products = [];
-
-        // Update the cart in the database
-        const updatedCart = await cartService.updateCart(cart);
-
-        res.status(200).json({ message: 'Cart cleared successfully' });
+        // Respond with a success message or other appropriate response
+        res.status(204).send();
     } catch (error) {
-        res.status(500).json({ error: 'Failed to clear the cart' });
+        // Pass the error to the error-handling middleware
+        next(error);
     }
-};
-
-
+}
 async function purchaseCart(req, res) {
     try {
         const cartId = req.params.cid;

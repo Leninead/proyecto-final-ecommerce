@@ -1,3 +1,5 @@
+const userRepository = require('../Repository/userRepository');
+const userRepositoryInstance = new userRepository();
 const UserService = require('../services/userService');
 const userService = new UserService();
 
@@ -7,38 +9,46 @@ class UserController {
 
   async registerUser(req, res) {
     try {
-      // 1. Validate the user's registration data (ensure you have validation middleware)
       const { firstName, lastName, email, password } = req.body;
-  
+
       if (!firstName || !lastName || !email || !password) {
-        console.log('Incomplete registration data')
+        console.log('Incomplete registration data');
         return res.status(400).json({ message: 'Incomplete registration data' });
       }
-  
-      // 2. Check if the email is unique (not already registered)
-      const existingUser = await userService.getUserByEmail(email);
-  
+
+      const existingUser = await userRepositoryInstance.getUserByEmail(email);
+
       if (existingUser) {
         return res.status(400).json({ message: 'Email already registered' });
       }
-  
-      // 3. Hash the user's password securely (you should have a password hashing function)
-      const hashedPassword = await userService.hashPassword(password);
-  
-      // 4. Create a new user record in the database
-      const user = await userService.createUser({
+
+      const user = await userRepositoryInstance.createUser({
         firstName,
         lastName,
         email,
-        password: hashedPassword,
+        password,
       });
-  
-      // 5. Return a response to the client
-      res.status(201).json(user);
+
+      // Generate a JWT token for the user
+      const payload = { userId: user._id, username: user.username };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+      if (!token) {
+        console.error('Error generating JWT token');
+        return res.status(500).json({ message: 'Error registering user. Could not generate token.' });
+      }
+
+      console.log('Generated Token:', token);
+
+      // Return a response to the client with the token
+      res.status(201).json({ message: 'User registered successfully', token });
     } catch (error) {
+      console.error('Error:', error);
       res.status(500).json({ message: 'Error registering user', error: error.message });
     }
   }
+  
+  
   
   async loginUser(req, res) {
     try {
@@ -65,15 +75,16 @@ class UserController {
   
       // 4. If the verification is successful, generate a JWT token for the user
       const token = await userService.generateJWT(user);
+      console.log('Generated Token:', token);
   
-      // 5. Return the token to the client
-      res.json({ token });
+      // 5. Return a response to the client with the token
+      res.status(200).json({ message: 'Authentication successful', token });
     } catch (error) {
-      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+      console.error('Error:', error);
+      res.status(500).json({ message: 'Error authenticating user', error: error.message });
     }
   }
   
-
   async logoutUser(req, res) {
     try {
       // If you're using JWT tokens, you can have a blacklist of tokens or simply remove the token from the client's side to invalidate it.

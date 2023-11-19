@@ -1,19 +1,13 @@
+// passport.js
+
 const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const { User } = require('../models/user.model');
-const { isValidatePassword } = require('../utils');
+const { isValidatePassword } = require('../utils/utils.js');
 const { JWT_SECRET } = require('../config/config');
 
-const cookieExtractor = (req) => {
-  let token = null;
-  if (req && req.cookies) {
-    token = req.cookies['jwt']; // Assuming your cookie is named 'jwt'
-  }
-  return token;
-};
-
-const configurePassport = () => {
+function configurePassport() {
   // Local Strategy
   passport.use('login', new LocalStrategy(
     { usernameField: 'email' },
@@ -42,14 +36,17 @@ const configurePassport = () => {
   const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromExtractors([
       ExtractJwt.fromAuthHeaderAsBearerToken(),
-      cookieExtractor, // Add the cookieExtractor here
+      (req) => req.cookies['jwt'],
     ]),
-    secretOrKey: JWT_SECRET, // Use the JWT_SECRET from your environment variables
+    secretOrKey: JWT_SECRET,
   };
-  
+
+  console.log(`JWT_SECRET in configurePassport: ${JWT_SECRET}`); // Add this line
+
   passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {
       const user = await User.findById(jwtPayload.id);
+
       if (user) {
         return done(null, user);
       } else {
@@ -58,7 +55,10 @@ const configurePassport = () => {
     } catch (error) {
       return done(error, false);
     }
-  }))
+  }));
 }
 
-module.exports = configurePassport;
+// Invoke configurePassport before using passport middleware
+configurePassport();
+
+module.exports = passport;

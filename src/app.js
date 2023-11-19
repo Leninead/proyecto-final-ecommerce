@@ -68,45 +68,165 @@ You can gradually work on these tasks one by one, starting with creating the DAO
 
 Remember to regularly test your application and document your progress. If you encounter specific challenges or have questions related to any of these tasks, feel free to ask for assistance or guidance on each specific task as you work through them.
 
-*/
+
+TO RUN THE ENPOINTS: 
+Users Routes:
+
+Retrieve current user: [GET] http://localhost:8080/users/current
+Home route: [GET] http://localhost:8080/users/
+User profile route: [GET] http://localhost:8080/users/profile
+Register a user: [POST] http://localhost:8080/users/register
+Log in a user: [POST] http://localhost:8080/users/login
+Log out a user: [POST] http://localhost:8080/users/logout
+Admin dashboard route: [GET] http://localhost:8080/users/admin
+Protected route to get the current user: [GET] http://localhost:8080/users/user
+Protected route for the admin dashboard: [GET] http://localhost:8080/users/admin-dashboard
+Protected route to get the current user (API style): [GET] http://localhost:8080/users/api/sessions/current
+Cart Routes:
+
+Create a cart: [POST] http://localhost:8080/cart/
+Get a cart by user ID: [GET] http://localhost:8080/cart/:userId
+Add a product to the cart: [POST] http://localhost:8080/cart/:cartId/products
+Update the product quantity: [PUT] http://localhost:8080/cart/:cartId/products/:productId
+Remove a specific product from the cart: [DELETE] http://localhost:8080/cart/:cartId/products/:productId
+Clear the entire cart: [DELETE] http://localhost:8080/cart/:cartId
+Purchase cart: [POST] http://localhost:8080/cart/:cid/purchase
+Products Routes:
+
+Create a product: [POST] http://localhost:8080/products/
+Add a product to the cart: [POST] http://localhost:8080/products/addToCart
+Update a product in the cart: [PUT] http://localhost:8080/products/updateCartProduct/:productId
+Update the quantity of a product in the cart: [PUT] http://localhost:8080/products/updateQuantityProduct/:productId
+Get the contents of the cart: [GET] http://localhost:8080/products/getCartContents
+Remove a product from the cart: [DELETE] http://localhost:8080/products/removeFromCart/:productId
+Ticket Routes:
+
+Create a ticket: [POST] http://localhost:8080/tickets/create
+Get a list of tickets: [GET] http://localhost:8080/tickets/list
+Authentication Routes:
+
+Authenticate a user (returning a JWT token): [POST] http://localhost:8080/auth/authenticate
+Protected Routes:
+
+Protected resource route: [GET] http://localhost:8080/protected-resource
+Now, let's double-check the 
+
+
+
+Thank you for sharing the authentication middleware code. The "Unauthorized" response is being sent when there's an issue with either not receiving a token or a problem with token verification.
+
+Since you mentioned that you've registered a user, let's focus on the registration and authentication process. Make sure the following steps are correctly implemented:
+
+User Registration (users.router.js):
+
+Confirm that your user registration endpoint is correctly creating a new user in the database.
+Check that the password is being securely hashed before storing it in the database.
+Ensure that the registration endpoint returns a valid JWT token upon successful registration.
+User Authentication (auth.js):
+
+Confirm that your authentication endpoint is correctly authenticating users based on their credentials.
+Make sure the authentication endpoint returns a valid JWT token upon successful authentication.
+Sending Token in the Request:
+
+When you make a request to a secured endpoint, make sure you are including the JWT token in the request headers. It should be in the format: Authorization: Bearer YOUR_TOKEN.
+Token Verification (authenticationMiddleware):
+
+Ensure that the JWT_SECRET used for signing and verifying tokens is correctly set in your environment variables.
+Here's an example of how you can register a user and obtain a token:
+
+Register User:
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+
+
+Thank you for sharing the authentication middleware code. The "Unauthorized" response is being sent when there's an issue with either not receiving a token or a problem with token verification.
+
+Since you mentioned that you've registered a user, let's focus on the registration and authentication process. Make sure the following steps are correctly implemented:
+
+User Registration (users.router.js):
+
+Confirm that your user registration endpoint is correctly creating a new user in the database.
+Check that the password is being securely hashed before storing it in the database.
+Ensure that the registration endpoint returns a valid JWT token upon successful registration.
+User Authentication (auth.js):
+
+Confirm that your authentication endpoint is correctly authenticating users based on their credentials.
+Make sure the authentication endpoint returns a valid JWT token upon successful authentication.
+Sending Token in the Request:
+
+When you make a request to a secured endpoint, make sure you are including the JWT token in the request headers. It should be in the format: Authorization: Bearer YOUR_TOKEN.
+Token Verification (authenticationMiddleware):
+
+Ensure that the JWT_SECRET used for signing and verifying tokens is correctly set in your environment variables.
+Here's an example of how you can register a user and obtain a token:
+
+Register User:
+
+http
+Copy code
+POST http://localhost:8080/users/register
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+If the registration is successful, the response should include a JWT token.
+
+Authenticate User:
+POST http://localhost:8080/auth/authenticate
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+
+GET http://localhost:8080/secure-route
+Authorization: Bearer YOUR_TOKEN
+
+*/ 
+
 const express = require('express');
-const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const dotenv = require('dotenv');
+const session = require('express-session');
+const passport = require('passport');
+const { sessionSecret, jwtSecret } = require('../generate-secret'); // Update the path accordingly
 const authenticationMiddleware = require('./middlewares/authentication');
-const passport = require('passport'); // Import Passport
-const passportConfig = require('./config/passport');
-const emailRouter = require('./routes/email.router'); // Import your email router
-const twilio = require('twilio');
-const smsRouter = require('./routes/sms.router');
+const emailRouter = require('./services/email.router');
+const smsRouter = require('./services/sms.router');
+const ticketRoutes = require('./routes/ticket.router');
+const connectDB = require('./db');
+require('./config/passport'); // Import passport configuration
+require('dotenv').config();
+require('dotenv').config({ path: 'twilio.env' });
 
+// Connect to the database
+connectDB();
 
-passportConfig(passport);
-// Load environment variables from .env
-dotenv.config();
-// Load environment variables from .env
-dotenv.config();
-
+console.log(`JWT Secret: ${jwtSecret}`);
 console.log(`Server is running on port ${process.env.PORT}`);
 console.log(`MongoDB URI: ${process.env.MONGODB_URI}`);
 console.log(`JWT Secret: ${process.env.JWT_SECRET}`);
 console.log(`Twilio Account SID: ${process.env.TWILIO_ACCOUNT_SID}`);
-console.log(`Twilio Auth Token: ${process.env.TWILIO_AUTH_TOKEN}`); // Add this line
-
-// Create the Twilio client
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN); // Set up Twilio client
-
+console.log(`Twilio Auth Token: ${process.env.TWILIO_AUTH_TOKEN}`);
 
 // Initialize the Express app
 const app = express();
 
-// Use the authentication middleware globally for all routes
-app.use(authenticationMiddleware);
 // Use your email router
 app.use('/email', emailRouter);
-
 app.use('/sms', smsRouter);
 
 // Set up the database connection (Use the MONGODB_URI from .env)
@@ -118,9 +238,15 @@ mongoose.connect(process.env.MONGODB_URI, {
 // Configure and use Express session
 app.use(
   session({
-    secret: process.env.SESSION_SECRET, // Use an environment variable for the secret
+    secret: process.env.SESSION_SECRET || 'your_fallback_session_secret_here',
     resave: false,
     saveUninitialized: true,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 86400000,
+      sameSite: 'strict',
+    },
   })
 );
 
@@ -131,28 +257,32 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-
 // Use Passport middleware
 app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.session());
+
+// Use the authentication middleware globally for all routes
+app.use(authenticationMiddleware);
 
 // Include your routes (Update routes to match your project structure)
 const cartRoutes = require('./routes/cart.router');
 const productRoutes = require('./routes/products.router');
 const userRoutes = require('./routes/users.router');
 const authRoutes = require('./routes/auth');
+const protectedRoutes = require('./routes/protectedRouted');
 
 app.use('/cart', cartRoutes);
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
-
+// Use the authentication middleware for /tickets routes
+app.use('/tickets', authenticationMiddleware, ticketRoutes);
+// Use the authentication middleware for protected routes
+app.use('/protected', authenticationMiddleware, protectedRoutes);
 
 // Example route for the home page
 app.get('/', (req, res) => {
