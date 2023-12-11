@@ -1,2 +1,5 @@
 node_modules
 .env
+
+# Swagger generated files
+src/swagger-output.json

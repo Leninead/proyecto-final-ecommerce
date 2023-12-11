@@ -202,12 +202,15 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
-const { sessionSecret, jwtSecret } = require('../generate-secret'); // Update the path accordingly
+const { sessionSecret, jwtSecret } = require('../generate-secret');
 const authenticationMiddleware = require('./middlewares/authentication');
 const emailRouter = require('./services/email.router');
 const smsRouter = require('./services/sms.router');
 const ticketRoutes = require('./routes/ticket.router');
 const connectDB = require('./db');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUIExpress = require('swagger-ui-express');
+const swaggerOptions = require('../src/swaggerOptions'); // Adjust the path accordingly
 require('dotenv').config();
 
 // Connect to the database
@@ -226,6 +229,11 @@ const app = express();
 // Use your email router
 app.use('/email', emailRouter);
 app.use('/sms', smsRouter);
+
+// Swagger setup
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/apidocs', swaggerUIExpress.serve, swaggerUIExpress.setup(specs));
+
 
 // Set up the database connection (Use the MONGODB_URI from .env)
 mongoose.connect(process.env.MONGODB_URI, {

@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken'); // Add this line
 const userRepository = require('../Repository/userRepository');
 const userRepositoryInstance = new userRepository();
 const UserService = require('../services/userService');
@@ -6,7 +7,6 @@ const userService = new UserService();
 class UserController {
 
   
-
   async registerUser(req, res) {
     try {
       const { firstName, lastName, email, password } = req.body;
@@ -47,8 +47,7 @@ class UserController {
       res.status(500).json({ message: 'Error registering user', error: error.message });
     }
   }
-  
-  
+
   
   async loginUser(req, res) {
     try {

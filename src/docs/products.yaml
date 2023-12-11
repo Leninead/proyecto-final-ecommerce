@@ -1,0 +1,71 @@
+# products.yaml
+paths:
+  /api/products:
+    get:
+      summary: Get all products
+      tags:
+        - Products
+      responses:
+        "200":
+          description: "Data retrieved successfully"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        "500":
+          description: "Internal server error"
+
+  /api/products/{productId}:
+    get:
+      summary: Get a product by ID
+      tags:
+        - Products
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: ID of the product to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Product found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "500":
+          description: "Internal server error"
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: MongoDB generated ID
+        name:
+          type: string
+          description: Name of the product
+        description:
+          type: string
+          description: Description of the product
+        price:
+          type: number
+          description: Price of the product
+        stock:
+          type: number
+          description: Stock quantity of the product
+        quantity:
+          type: number
+          description: Quantity of the product in the cart
+      example:
+        _id: "ObjectId(30)"
+        name: "Sample Product"
+        description: "A sample product for demonstration"
+        price: 19.99
+        stock: 100
+        quantity: 0

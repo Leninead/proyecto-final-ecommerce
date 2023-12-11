@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
-const userController = require('../controllers/userController');
-const authenticationMiddleware = require('../middlewares/authentication');
+const passport = require('passport'); // Add this line
+const authenticationMiddleware = require('../middlewares/authentication'); // Add this line
+const UserController = require('../controllers/userController');
+const userController = new UserController(); // Create an instance
 
 // Authentication middleware
 const jwtAuthMiddleware = passport.authenticate('jwt', { session: false });
@@ -22,9 +23,11 @@ router.get('/profile', (req, res) => {
 
 
 // Register a user (POST /register)
+
 router.post('/register', async (req, res) => {
   await userController.registerUser(req, res);
 });
+
 
 // Log in a user (POST /login)
 router.post('/login', (req, res) => userController.loginUser(req, res));
