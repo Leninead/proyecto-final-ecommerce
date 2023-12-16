@@ -1,15 +1,18 @@
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-// Placeholder function for generating a new JWT secret
+// Rest of your code...
+
+
 function generateNewJWTSecret() {
-  // Replace this with your actual logic to generate the JWT secret
-  return 'your_generated_jwt_secret_here';
+  // Generate a random string as the JWT secret
+  const secretLength = 32; // You can adjust the length as needed
+  const randomBytes = crypto.randomBytes(secretLength);
+  const jwtSecret = randomBytes.toString('hex');
+
+  return jwtSecret;
 }
-
-const newlyGeneratedJWTSecret = generateNewJWTSecret();
-
-// Your existing code to generate secrets...
 
 const envPath = path.resolve(__dirname, '../.env');
 
@@ -19,7 +22,7 @@ const existingEnvContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'ut
 // Update or add the JWT_SECRET line
 const updatedEnvContent = existingEnvContent.replace(
   /^JWT_SECRET=.*/m,
-  `JWT_SECRET=${newlyGeneratedJWTSecret}`
+  `JWT_SECRET=${generateNewJWTSecret()}`
 );
 
 // Write the updated content back to the .env file

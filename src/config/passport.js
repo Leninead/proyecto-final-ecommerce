@@ -5,7 +5,8 @@ const { Strategy: LocalStrategy } = require('passport-local');
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const { User } = require('../models/user.model');
 const { isValidatePassword } = require('../utils/utils.js');
-const { JWT_SECRET } = require('../config/config');
+const { jwtSecret } = require('../generate-secret');
+
 
 function configurePassport() {
   // Local Strategy
@@ -38,9 +39,9 @@ function configurePassport() {
       ExtractJwt.fromAuthHeaderAsBearerToken(),
       (req) => req.cookies['jwt'],
     ]),
-    secretOrKey: JWT_SECRET,
+    secretOrKey: jwtSecret, // Use jwtSecret instead of JWT_SECRET
   };
-
+  
   console.log(`JWT_SECRET in configurePassport: ${JWT_SECRET}`); // Add this line
 
   passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
