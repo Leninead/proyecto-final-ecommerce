@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-// Rest of your code...
+
 
 
 function generateNewJWTSecret() {

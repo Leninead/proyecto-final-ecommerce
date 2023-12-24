@@ -42,21 +42,23 @@ function configurePassport() {
     secretOrKey: jwtSecret, // Use jwtSecret instead of JWT_SECRET
   };
   
-  console.log(`JWT_SECRET in configurePassport: ${JWT_SECRET}`); // Add this line
+  console.log(`jwtSecret in configurePassport: ${jwtSecret}`);
+ // Add this line
 
   passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
     try {
       const user = await User.findById(jwtPayload.id);
-
+  
       if (user) {
         return done(null, user);
       } else {
-        return done(null, false);
+        return done(null, false, { message: 'User not found' });
       }
     } catch (error) {
-      return done(error, false);
+      return done(error, false, { message: 'Error finding user' });
     }
   }));
+  
 }
 
 // Invoke configurePassport before using passport middleware

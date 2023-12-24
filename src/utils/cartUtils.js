@@ -1,8 +1,6 @@
-
-const CartRepository = require('../Repository/cartRepository')
-const Ticket = require('../models/ticket.model'); // Import your Ticket model
-const Product = require('../models/product.model'); // Import your Product model
-const UserService = require('../services/userService')
+const CartRepository = require('../Repository/cartRepository');
+const Product = require('../models/product.model');
+const UserService = require('../services/userService');
 
 async function calculateTotalCost(cart) {
     let totalCost = 0;
@@ -16,30 +14,6 @@ async function calculateTotalCost(cart) {
 
     return totalCost;
 }
-
-
-
-async function createTicketsFromCart(products, userId) {
-    const tickets = [];
-
-    // Loop through the products in the cart and create a ticket for each one
-    for (const product of products) {
-        const ticket = new Ticket({
-            userId, // Assign the user ID to the ticket
-            productId: product.productId, // Assign the product ID to the ticket
-            quantity: product.quantity, // Assign the quantity from the cart
-           
-        });
-
-        // Save the ticket to the database
-        await ticket.save();
-
-        tickets.push(ticket); // Add the created ticket to the tickets array
-    }
-
-    return tickets;
-}
-
 
 async function updateProductStock(products) {
     for (const product of products) {
@@ -93,11 +67,10 @@ async function updateUserBalance(userId, totalCost) {
     }
 }
 
-
 async function clearCartItems(cartId) {
     try {
         // Find the cart by ID
-        const cart = await CartRepository.getCartById(cartId); // You should have a method in your CartRepository to retrieve the cart by ID.
+        const cart = await CartRepository.getCartById(cartId);
 
         if (!cart) {
             throw new Error('Cart not found');
@@ -107,7 +80,7 @@ async function clearCartItems(cartId) {
         cart.products = [];
 
         // Update the cart in the database
-        await cartService.updateCart(cart); // You should have a method in your cartService to update the cart.
+        await CartRepository.updateCart(cart);
 
         // You might also want to return a success message
         return 'Cart cleared successfully';
@@ -116,10 +89,8 @@ async function clearCartItems(cartId) {
     }
 }
 
-
 module.exports = {
     calculateTotalCost,
-    createTicketsFromCart,
     updateProductStock,
     updateUserBalance,
     clearCartItems,

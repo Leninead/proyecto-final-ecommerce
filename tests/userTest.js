@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 const User = require('../models/user.model');
 const Cart = require('../models/cart.model');
 
-describe('Cart Router Tests', () => {
+describe('Users Router Tests', () => {
   let userId; // Declare userId outside the tests to use it across multiple tests
-  let cartId; // Declare cartId to use it across multiple tests
+  let sessionId; // Declare sessionId to use it across multiple tests
 
-  // Retrieve the user ID from the registered user
+  // Register a user before running tests
   before(async () => {
     const registerResponse = await request
       .post('/api/users/register')
@@ -16,61 +16,64 @@ describe('Cart Router Tests', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john.doe@example.com',
-        age: 25,
         password: 'securepassword',
-        role: 'user',
       });
 
     userId = registerResponse.body._id;
   });
 
-  // Create a cart for the user before running tests
+  // Login and create a session for the user before running tests
   before(async () => {
-    const createCartResponse = await request
-      .post('/api/cart')
+    const loginResponse = await request
+      .post('/api/users/login')
       .send({
-        userId: userId,
+        email: 'john.doe@example.com',
+        password: 'securepassword',
       });
 
-    cartId = createCartResponse.body._id;
+    sessionId = loginResponse.body.token;
   });
 
-  // Test 2: Retrieve cart contents
-  it('should retrieve cart contents', async () => {
-    // Make a request to retrieve the contents of the cart
-    const retrieveCartContentsResponse = await request.get(`/api/cart/${cartId}`);
+  // Test 1: Retrieve current user
+  it('should retrieve current user', async () => {
+    const retrieveCurrentUserResponse = await request
+      .get('/api/users/current')
+      .set('Authorization', `Bearer ${sessionId}`);
 
     // Check the response status code
-    expect(retrieveCartContentsResponse.status).to.equal(200);
+    expect(retrieveCurrentUserResponse.status).to.equal(200);
 
     // Check the response body properties
-    expect(retrieveCartContentsResponse.body).to.have.property('_id', cartId);
-    expect(retrieveCartContentsResponse.body).to.have.property('userId', userId);
-    expect(retrieveCartContentsResponse.body).to.have.property('products').that.is.an('array');
+    expect(retrieveCurrentUserResponse.body).to.have.property('_id', userId);
+    expect(retrieveCurrentUserResponse.body).to.have.property('firstName', 'John');
+    expect(retrieveCurrentUserResponse.body).to.have.property('lastName', 'Doe');
+    // Add more checks based on your user model
+  });
+
+  // Test 2: Retrieve user profile
+  it('should retrieve user profile', async () => {
+    const retrieveUserProfileResponse = await request
+      .get('/api/users/profile')
+      .set('Authorization', `Bearer ${sessionId}`);
+
+    // Check the response status code
+    expect(retrieveUserProfileResponse.status).to.equal(200);
+
+    // Add more checks based on your user profile response
   });
 
   // ... (other tests)
 
-  // Cleanup: Remove the test user and cart after all tests are done
+  // Cleanup: Remove the test user and session after all tests are done
   after(async () => {
     try {
-      // Find the test cart and associated products
-      const testCart = await Cart.findOne({ user: userId });
-  
-      if (testCart) {
-        // Remove associated products
-        await Product.deleteMany({ _id: { $in: testCart.products.map(product => product.product) } });
-  
-        // Remove the test cart
-        await Cart.deleteOne({ _id: testCart._id });
-  
-        console.log('Cleanup: Removed test cart and associated products from the database');
-      }
-  
       // Remove the test user
-      await User.deleteOne({ email: 'john.doe@example.com' });
-  
-      console.log('Cleanup: Removed test user from the database');
+      await User.deleteOne({ _id: userId });
+
+      // Remove the test session (if required)
+      // Implement your session cleanup logic based on your authentication setup
+
+      console.log('Cleanup: Removed test user and session from the database');
     } catch (error) {
       console.error('Error during cleanup:', error.message);
     }

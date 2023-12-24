@@ -40,23 +40,26 @@ Share the link to your GitHub repository without the node_modules folder. This e
 Remember, this task is an opportunity to showcase the robustness of your testing strategy. Feel free to be creative and thorough in your test scenarios. If you encounter any specific challenges or have questions while implementing the tests, feel free to ask for assistance!
 
 
-*/ 
-require('dotenv').config();
+*/
+
+
+
+  
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('passport');
-const { sessionSecret, jwtSecret } = require('../generate-secret');
+const { jwtSecret } = require('../generate-secret');
 const authenticationMiddleware = require('./middlewares/authentication');
 const emailRouter = require('./services/email.router');
 const smsRouter = require('./services/sms.router');
-const ticketRoutes = require('./routes/ticket.router');
 const connectDB = require('./db');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUIExpress = require('swagger-ui-express');
-const swaggerOptions = require('./swaggerOptions'); 
+const swaggerOptions = require('../src/swaggerOptions'); // Adjust the path accordingly
+require('dotenv').config();
 
 // Connect to the database
 connectDB();
@@ -79,22 +82,10 @@ app.use('/sms', smsRouter);
 const specs = swaggerJsdoc(swaggerOptions);
 app.use('/apidocs', swaggerUIExpress.serve, swaggerUIExpress.setup(specs));
 
-
-// Set up the database connection (Use the MONGODB_URI from .env)
 // Set up the database connection (Use the MONGODB_URI from .env)
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
-
-mongoose.connection.on('connected', () => {
-  console.log('Connected to MongoDB');
-});
-
-mongoose.connection.on('error', (error) => {
-  console.error('Error connecting to MongoDB:', error.message);
-  // You might want to handle the error in a way that fits your application's needs
-  process.exit(1); // Exit the application on database connection failure
 });
 
 // Configure and use Express session
@@ -127,24 +118,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Use the authentication middleware globally for all routes
-app.use(authenticationMiddleware);
-
 // Include your routes (Update routes to match your project structure)
 const cartRoutes = require('./routes/cart.router');
 const productRoutes = require('./routes/products.router');
 const userRoutes = require('./routes/users.router');
-const authRoutes = require('./routes/auth');
-const protectedRoutes = require('./routes/protectedRouted');
 
-app.use('/cart', cartRoutes);
+
+app.use('/carts', authenticationMiddleware, cartRoutes)
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
-app.use('/auth', authRoutes);
-// Use the authentication middleware for /tickets routes
-app.use('/tickets', authenticationMiddleware, ticketRoutes);
-// Use the authentication middleware for protected routes
-app.use('/protected', authenticationMiddleware, protectedRoutes);
+
+
+
 
 // Example route for the home page
 app.get('/', (req, res) => {

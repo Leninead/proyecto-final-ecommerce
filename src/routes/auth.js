@@ -22,5 +22,4 @@ const generateToken = (req, res, next) => {
 router.post('/login', generateToken, (req, res) => {
   res.json({ token: req.token });
 });
-
-module.exports = router;
+module.exports = { generateToken };
