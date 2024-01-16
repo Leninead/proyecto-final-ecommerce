@@ -1,6 +1,6 @@
 const supertest = require('supertest');
 const chai = require('chai');
-const app = require('../src/app');  // Assuming your Express app is in src/app.js
+const app = require('../../src/app');  // Assuming your Express app is in src/app.js
 const { v4: uuidv4 } = require('uuid');  
 const { productIds } = require('../constants');  // Import the productIds from constants.js
 
