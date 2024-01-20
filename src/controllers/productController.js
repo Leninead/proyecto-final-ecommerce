@@ -1,6 +1,6 @@
 // controllers/productController.js
 const Product = require('../models/product.model');
-const ProductRepository = require('../repositories/product.repository'); // Add this import
+const ProductRepository = require('../repositories/productRepository'); // Add this import
 
 const ProductController = {
   getProductById: async (req, res) => {

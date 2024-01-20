@@ -1,5 +1,5 @@
 const User = require('../models/user.model');
-const UserRepository = require('../repositories/user.repository');
+const UserRepository = require('../repositories/userRepository');
 
 const UserController = {
   getAllUsers: async (req, res) => {

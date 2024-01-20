@@ -1,6 +1,6 @@
 // controllers/cartController.js
 const Cart = require('../models/cart.model');
-const CartRepository = require('../repositories/cart.repository'); // Import the CartRepository
+const CartRepository = require('../repositories/cartRepository'); // Import the CartRepository
 
 const CartController = {
   addToCart: async (req, res) => {
