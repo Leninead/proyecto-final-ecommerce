@@ -47,8 +47,13 @@ const CartDAO = {
 
   clearUserCart: async (userId) => {
     try {
-      const result = await Cart.updateOne({ user: userId }, { $set: { products: [] } });
-      return result;
+      const clearedCart = await Cart.findOneAndUpdate(
+        { user: userId },
+        { $set: { products: [] } },
+        { new: true }
+      );
+
+      return clearedCart;
     } catch (error) {
       console.error(error);
       throw new Error('Failed to clear user cart');

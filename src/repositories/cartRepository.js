@@ -45,9 +45,10 @@ const CartRepository = {
   },
 
 
+  
   clearUserCart: async (userId) => {
     try {
-      const result = await Cart.updateOne({ user: userId }, { $set: { products: [] } });
+      const result = await CartDAO.clearUserCart(userId);
       return result;
     } catch (error) {
       console.error(error);
